@@ -1,9 +1,9 @@
-import { defineConfig, loadEnv, UserConfig } from 'vite';
+import {defineConfig, loadEnv, UserConfig} from 'vite';
 import path from 'path';
-import fs from 'fs';
+import {JsonRpcProvider, Network, NETWORK_TO_API} from '@mysten/sui.js';
 
-import { createVitePlugins } from './build/vite/plugins';
-import { ViteEnv } from './types/model';
+import {createVitePlugins} from './build/vite/plugins';
+import {ViteEnv} from './types/model';
 
 enum ConfigMode {
     development = 1, // 防止 0 情况 if 出错
@@ -13,8 +13,21 @@ enum ConfigMode {
     production,
 }
 
+// 测试用
+function testApi(){
+    // const provider = new JsonRpcProvider(Network.DEVNET);
+    // console.log("Network->",Network)
+    // provider.requestSuiFromFaucet(
+    //     '0x54fb68ff3d8b9003a55641756b819b4057d52978'
+    // ).then((res)=>{
+    //     console.log("getObject",res)
+    // });
+    // // console.log("provider->",provider)
+}
+
 // 输出配置文件
 export default defineConfig(({ command, mode }) => {
+    testApi();
     console.log('command ->', command);
     console.log('mode ->', mode);
 
@@ -31,10 +44,10 @@ export default defineConfig(({ command, mode }) => {
         viteEnv.VITE_DROP_DEBUGGER = readEnv.VITE_DROP_DEBUGGER === 'true';
     console.log('viteEnv ->', viteEnv); // 输出加载的变量
 
-    const network = getNetwork(viteEnv);
+    const network = viteEnv.VITE_NETWORK;
     console.log('network ->', network);
 
-    const location = getLocation(viteEnv);
+    const location = getLocation(viteEnv); //sui本地端口 获取后端运行地址
     console.log('server location ->', location); //
 
     process.env.configMode = ConfigMode[configMode];
@@ -82,7 +95,7 @@ export default defineConfig(({ command, mode }) => {
                 },
             },
             rollupOptions: {
-                // external: ["element-plus"], //! 天坑的，因为这个配置耗费了好几个小时，我白白的睡眠时间啊
+                // external: ["element-plus"],
                 output: {
                     manualChunks: {
                         vue: ['vue', 'vue-router', 'vuex'], // 目前打包还是这个最小，还没有 bug
@@ -95,7 +108,7 @@ export default defineConfig(({ command, mode }) => {
                     //     // if (
                     //     //     id.includes("node_modules") &&
                     //     //     id.match(/element-plus|legacy/)
-                    //     // ) { // TODO 本来是想解决打包过大问题，但是现在发现，打的包会失效无法线上运行，得嘞，虽然不报 charset 的错误了，但是不能运行也太坑了
+                    //     // ) { // TODO 本来是想解决打包过大问题，但是现在发现，打的包会失效无法线上运行
                     //     //     return id
                     //     //         .toString()
                     //     //         .split("node_modules/")[1]
@@ -144,36 +157,22 @@ export default defineConfig(({ command, mode }) => {
     }
 });
 
+// 获取后端运行地址，本地/在线
+function getLocation(viteEnv: ViteEnv): string {
+    const position = viteEnv.VITE_NETWORK;
+    if (position==='local') {
+        return NETWORK_TO_API.LOCAL.fullNode;
+    }
+    return NETWORK_TO_API.DEVNET.fullNode;
+}
+
+
 // 判断配置模式
 function getConfigMode(mode: string): ConfigMode {
     if (ConfigMode[mode]) {
         return ConfigMode[mode];
     }
     throw new Error('can not recognize mode: ' + mode);
-}
-
-// 判断网络
-function getNetwork(viteEnv: ViteEnv) {
-    if (!viteEnv.VITE_NETWORK) {
-        throw new Error('config network is missing. please set config VITE_NETWORK');
-    }
-    const network = process.env.VITE_NETWORK;
-    if (network && network !== viteEnv.VITE_NETWORK) {
-        console.log(
-            `config process.env.DFX_NETWORK is ${network}. but VITE_NETWORK is ${viteEnv.VITE_NETWORK}`,
-        );
-    }
-    return viteEnv.VITE_NETWORK;
-}
-
-// 获取后端运行地址
-function getLocation(viteEnv: ViteEnv): string {
-    const position = viteEnv.VITE_LOCAL_DFX;
-    if (position) {
-        const dfxJson = require(position);
-        return 'http://' + dfxJson.networks.local.bind;
-    }
-    return 'https://mainnet.dfinity.network';
 }
 
 function getMode(configMode: ConfigMode) {

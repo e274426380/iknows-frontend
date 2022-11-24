@@ -65,15 +65,14 @@
                         </ul>
                     </div>
                     <!-- Login -->
-                    <div class="login" v-if="!signedIn && clientReady">
+                    <div class="login">
                         <div
                             :class="{ zhCn: t(currentLanguage) === '简体中文' }"
                             @click="onLogin"
                         >
-                            <div>
-                                {{ t('navbar.login') }}
-                            </div>
-                            <!--<img src="@/assets/images/navigator/right-arrow.png" />-->
+                            <LoginButton>
+                                Connect wallet
+                            </LoginButton>
                         </div>
                     </div>
                     <!-- username -->
@@ -133,12 +132,17 @@
         setUserInfoText,
         setUsernameText
     } from '@/store/modules/user';
+    import { Ed25519Keypair, JsonRpcProvider, RawSigner } from '@mysten/sui.js';
+    import { applyPureReactInVue } from 'veaury'
+    import { SignInButton } from 'ethos-connect'
     import { useStore } from 'vuex';
     import { useRouter } from 'vue-router';
     import { UserText } from '@/store';
-    import { Auth } from '@/types/auth';
-    import {UserInfoElement} from "@/types/user";
-    import {showUsername} from "@/common/utils";
+    import { UserInfoElement } from "@/types/user";
+    import { showUsername } from "@/common/utils";
+    import { useEthosForVue } from "@/common/wallet";
+
+    const LoginButton = applyPureReactInVue(SignInButton);
     const store = useStore();
     const router = useRouter();
     const props = defineProps({
@@ -150,9 +154,8 @@
         loginOutCallback: {
             type: Function,
             required: false,
-        },
+        }
     });
-
     const showMessageError = (message: string) =>
         ElMessage({
             showClose: true,
@@ -218,15 +221,26 @@
     };
 
     onMounted(() => {
+        console.log("onMounted")
+        test();
         doInitAuth();
         refreshMenu(); // 高亮当前选中的 tab
         // 动态检测宽度
         window.onresize = () => {
             screenWidth.value = document.documentElement.clientWidth;
         };
-        // 滚动事件
-        // document.addEventListener('scroll', onScroll);
     });
+
+    const test = async () => {
+        const {ethos} = useEthosForVue();
+        console.log("ethos",ethos)
+        console.log("ethos",ethos.status)
+
+        // Generate a new Ed25519 Keypair
+        // const keypair = new Ed25519Keypair();
+        // const provider = new JsonRpcProvider();
+        // const signer = new RawSigner(keypair, provider);
+    }
 
     const showedUsername = computed<string>(() => {
         if (!signedIn.value) return ''; // 没有登录返回空，按道理显示登录按钮不会调用本方法的

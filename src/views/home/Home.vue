@@ -1,16 +1,19 @@
 <template>
-    <div class="home-container">
-        <Navigator/>
-        <Public/>
-        <PostList/>
-    </div>
+    <VueMiss>
+        <div class="home-container">
+            <Navigator/>
+            <Public/>
+            <PostList/>
+        </div>
+    </VueMiss>
 </template>
 
 <script lang="ts" setup>
     import Navigator from '@/components/navigator/Navigator.vue';
     import Public from './modules/Public.vue';
     import PostList from './modules/PostList.vue';
-
+    import { VueMissReact } from "@/common/wallet";
+    const VueMiss = VueMissReact
 </script>
 
 <style lang="scss">
