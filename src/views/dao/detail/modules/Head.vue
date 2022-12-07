@@ -20,7 +20,7 @@
                                         <Username :principalId="proposal.proposer.toString()"
                                                   :username="author!==undefined && author.name!==''
                                                       ? author.name: ''"
-                                                :clickable="true"/>
+                                                  :clickable="true"/>
                                         <span>|</span>
                                         <span class="createTime">{{getTimeF(Number(proposal.created_at))}}</span>
                                     </div>
@@ -45,7 +45,7 @@
                                 <span v-else @click="isFold = !isFold" class="fold">{{t('common.fold')}}</span>
                             </div>
                             <!--<div v-if="isOwner">-->
-                                <!--<span class="fold" @click="dialogVisible=true">{{t('common.delete.title')}}</span>-->
+                            <!--<span class="fold" @click="dialogVisible=true">{{t('common.delete.title')}}</span>-->
                             <!--</div>-->
                         </div>
                         <Vote v-if="proposal.state.Open!==undefined && currentUserPrincipal"
@@ -72,30 +72,26 @@
     </el-dialog>
 </template>
 <script lang="ts" setup>
-    import {ref, onMounted, defineProps, PropType, computed, defineEmits} from 'vue';
-    import {ElRow, ElCol, ElButton, ElCard, ElTag, ElIcon, ElDialog} from 'element-plus/es';
-    import {Flag} from '@element-plus/icons-vue';
+    import { ref, onMounted, defineProps, PropType, computed, defineEmits } from 'vue';
+    import { ElRow, ElCol, ElButton, ElCard, ElTag, ElIcon, ElDialog } from 'element-plus/es';
+    import { Flag } from '@element-plus/icons-vue';
     import Avatar from '@/components/common/Avatar.vue';
     import Username from '@/components/common/Username.vue';
     import DaoState from '@/components/common/dao/DaoState.vue';
     import Vote from './Vote.vue';
-    import CategoryButton from '@/components/common/CategoryButton.vue';
-    import {ApiDaoProposal, ApiUserInfo} from "@/api/types";
-    import {getTimeF} from "@/utils/dates";
-    import {t} from '@/locale';
-    import {showMessageError, showMessageSuccess} from "@/utils/message";
-    import {goHome} from "@/router/routers";
-    import {useRoute, useRouter} from "vue-router";
-    import {useStore} from "vuex";
+    import { ApiDaoProposal, ApiUserInfo } from "@/api/types";
+    import { getTimeF } from "@/utils/dates";
+    import { t } from '@/locale';
+    import { useRoute, useRouter } from "vue-router";
+    import { useUserStore } from "@/stores/user";
 
-    const store = useStore();
-    const router = useRouter();
+    const userStore = useUserStore();
     const route = useRoute();
     const author = ref<ApiUserInfo>();
 
     const isFold = ref(true);
     const proposalId = Number(route.params.id);
-    const currentUserPrincipal = computed<string>(() => store.state.user.principal);
+    const currentUserPrincipal = computed<string>(() => userStore.address);
     const dialogVisible = ref(false);
     const loading = ref(false);
 
@@ -112,7 +108,7 @@
 
     const emit = defineEmits(['voteSuccess'])
 
-    const voteSuccess =() =>{
+    const voteSuccess = () => {
         emit('voteSuccess');
     }
 
@@ -130,8 +126,8 @@
 </script>
 <style lang="scss">
     /* 当页面宽度小于426px*/
-    @media screen and (max-width:426px) {
-        .dao-detail-head-container{
+    @media screen and (max-width: 426px) {
+        .dao-detail-head-container {
             padding: 0 10px;
         }
     }

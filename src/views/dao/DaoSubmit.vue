@@ -103,33 +103,30 @@
 </template>
 
 <script lang="ts" setup>
-    import {ref, onMounted, computed, nextTick} from 'vue';
+    import { ref, onMounted, computed, nextTick } from 'vue';
     import Navigator from '@/components/navigator/Navigator.vue';
     import {
         ElRow, ElCol, ElButton, ElSelect, ElOption, ElForm, ElFormItem, ElInput, ElMessage, ElConfigProvider,
         ElDatePicker, ElLoading
     } from 'element-plus/es';
-    import {Close} from '@element-plus/icons-vue';
-    import type {FormInstance, FormRules} from 'element-plus'
-    import {SupportedLocale, t} from '@/locale';
-    import {Quill, QuillEditor} from '@vueup/vue-quill';
+    import { Close } from '@element-plus/icons-vue';
+    import type { FormInstance, FormRules } from 'element-plus'
+    import { SupportedLocale, t } from '@/locale';
+    import { Quill, QuillEditor } from '@vueup/vue-quill';
     import ImageUploader from "quill-image-uploader";
-    import {useRoute, useRouter} from 'vue-router';
+    import { useRouter } from 'vue-router';
     import en from 'element-plus/lib/locale/lang/en';
     import zhCn from 'element-plus/lib/locale/lang/zh-cn';
-    import {useStore} from "vuex";
-    import {goBack} from "@/router/routers";
-    import {showMessageError, showMessageSuccess, showResultError} from "@/utils/message";
-    import {calculatedICPIdLength, uploadImage} from "@/utils/images";
+    import { goBack } from "@/router/routers";
+    import { showMessageError } from "@/utils/message";
+    import { calculatedICPIdLength, uploadImage } from "@/utils/images";
+    import { useUserStore } from "@/stores/user";
 
-    const store = useStore();
+    const userStore = useUserStore();
     const router = useRouter();
-    const route = useRoute();
 
-    const locale = computed<SupportedLocale>(() => {
-        return store.state.user.locale
-    });
-    const currentUserPrincipal = computed<string>(() => store.state.user.principal);
+    const locale = computed(() => userStore.getLocale);
+    const currentUserPrincipal = computed<string>(() => userStore.address);
     const loading = ref(false);
     //编辑器是否发生变化
     const isEditorChange = ref(false);
@@ -180,7 +177,7 @@
                 upload: (file) => {
                     return new Promise((resolve, reject) => {
                         uploadImage(file).then(res => {
-                                if (res!=='') {
+                                if (res !== '') {
                                     resolve(res)
                                 } else {
                                     reject()
@@ -239,7 +236,7 @@
                 if (dao.deadline) {
                     //结束时间，传到后端需要扩大一下位数
                     //@ts-ignore
-                    dao.deadline = Number(dao.deadline)* 1000 * 1000;
+                    dao.deadline = Number(dao.deadline) * 1000 * 1000;
                 }
                 console.log("dao", dao);
                 //submit
@@ -270,11 +267,11 @@
 <style lang="scss">
     .dao-submit-container {
         /* 当页面宽度小于426px*/
-        @media screen and (max-width:426px) {
-            .container{
+        @media screen and (max-width: 426px) {
+            .container {
                 padding: 0 10px;
             }
-            .post-form .el-form-item{
+            .post-form .el-form-item {
                 display: block;
             }
         }
@@ -288,8 +285,8 @@
                     border: 1px solid var(--el-color-danger);
                 }
             }
-            .el-form-item__content{
-                display: unset!important;
+            .el-form-item__content {
+                display: unset !important;
             }
             .submit-title {
                 margin-top: 20px;

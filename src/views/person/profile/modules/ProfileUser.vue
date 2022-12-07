@@ -165,7 +165,6 @@
 </template>
 <script lang="ts" setup>
     import {ref, onMounted, computed, defineEmits} from 'vue';
-    import {useStore} from 'vuex';
     import {useRoute, useRouter} from 'vue-router';
     import {t} from '@/locale';
     import {
@@ -178,8 +177,9 @@
     import {formatDate} from '@/utils/dates';
     import {showMessageError, showMessageSuccess} from "@/utils/message";
     import {toClipboard} from "@soerenmartius/vue3-clipboard";
+    import { useUserStore } from "@/stores/user";
 
-    const store = useStore();
+    const userStore = useUserStore();
     const router = useRouter();
     const route = useRoute();
     const dialogFormVisible = ref(false);
@@ -203,7 +203,7 @@
         created_at: 0,
         interests: []
     });
-    const currentUserPrincipal = computed<string>(() => store.state.user.principal);
+    const currentUserPrincipal = computed<string>(() => userStore.address);
     const targetPrincipal = ref('');
     // 是否是本人。关联编辑按钮的显示与否
     const isOwner = computed<boolean>(
@@ -218,7 +218,7 @@
     });
 
     const initReputation = () => {
-
+       //get
     }
 
     const copyPrincipal = async () => {
@@ -253,12 +253,12 @@
     const emit = defineEmits(['username','editProfile']);
 
     const initUser = () => {
-
+        //get
     }
 
     const updateAfter = () => {
         //修改用户信息后，重新刷新下缓存信息
-
+       //get
     }
 
     const updateSelf = async (formEl) => {
@@ -267,7 +267,7 @@
         await formEl.validate((valid, fields) => {
             if (valid) {
                 loading.value = true;
-
+                //edit
             } else {
                 console.error('error submit!', fields)
             }

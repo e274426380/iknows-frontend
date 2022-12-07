@@ -70,9 +70,9 @@
                             :class="{ zhCn: t(currentLanguage) === '简体中文' }"
                             @click="onLogin"
                         >
-                            <LoginButton>
-                                Connect wallet
-                            </LoginButton>
+                            <div>
+                                {{ t('navbar.login') }}
+                            </div>
                         </div>
                     </div>
                     <!-- username -->
@@ -124,27 +124,17 @@
 <script lang="ts" setup>
     import { ref, watch, computed, onMounted, defineProps, defineExpose } from 'vue';
     import { languages, SupportedLocale, t } from '@/locale';
-    import { ElBacktop, ElMessage, ElDropdown, ElDropdownItem, ElDropdownMenu } from 'element-plus/es';
-    import {
-        getLocaleText,
-        setLocaleText,
-        setPrincipalText,
-        setUserInfoText,
-        setUsernameText
-    } from '@/store/modules/user';
-    import { Ed25519Keypair, JsonRpcProvider, RawSigner } from '@mysten/sui.js';
-    import { applyPureReactInVue } from 'veaury'
-    import { SignInButton } from 'ethos-connect'
-    import { useStore } from 'vuex';
+    import { ElBacktop, ElDropdown, ElDropdownItem, ElDropdownMenu } from 'element-plus/es';
     import { useRouter } from 'vue-router';
-    import { UserText } from '@/store';
+    import { useUserStore } from '@/stores/user'
     import { UserInfoElement } from "@/types/user";
     import { showUsername } from "@/common/utils";
-    import { useEthosForVue } from "@/common/wallet";
+    import { registerUser } from "@/api/user";
+    import { useWallet } from "@/common/wallet";
 
-    const LoginButton = applyPureReactInVue(SignInButton);
-    const store = useStore();
+    const userStore = useUserStore();
     const router = useRouter();
+    const {requestWalletAccess} = useWallet();
     const props = defineProps({
         // II 认证成功 即 注册成功的回调
         loginInCallback: {
@@ -156,33 +146,15 @@
             required: false,
         }
     });
-    const showMessageError = (message: string) =>
-        ElMessage({
-            showClose: true,
-            message,
-            center: true,
-            type: 'error',
-        });
-    const showMessageSuccess = (message: string) =>
-        ElMessage({
-            showClose: true,
-            message,
-            center: true,
-            type: 'success',
-        });
 
     // 与 II 认证相关的信息
     // let auth = new Auth(); // 不能被 vue 代理，只能放到外面了
     const clientReady = ref(false);
     const signedIn = ref(false); // 是否登录
-    const principal= computed(() => store.state.user.principal);
-    const userInfo = computed(() => store.state.user.user);
-    const setUserInfo = (userInfo: UserInfoElement) =>
-        store.dispatch(UserText + '/' + setUserInfoText, userInfo);
-    const setPrincipal = (principal: string) =>
-        store.dispatch(UserText + '/' + setPrincipalText, principal);
-    const setUsername = (username: string) =>
-        store.dispatch(UserText + '/' + setUsernameText, username);
+    const address = computed(() => userStore.address);
+    const userInfo = computed(() => userStore.user);
+    // const setUserInfo = (userInfo: UserInfoElement) =>
+    //     store.dispatch(UserText + '/' + setUserInfoText, userInfo);
 
     const navbarRef = ref<HTMLElement | null>(null); // 导航栏ref属性
     const screenWidth = ref(document.documentElement.clientWidth); // 当前屏幕宽度
@@ -197,10 +169,10 @@
     ]);
 
     // 多语言设置
-    const locale = computed(() => store.getters[UserText + '/' + getLocaleText]);
+    const locale = computed(() => userStore.getLocale);
     const isEn = computed(() => locale.value === SupportedLocale.en);
-    const setLocale = (locale: SupportedLocale) =>
-        store.dispatch(UserText + '/' + setLocaleText, locale);
+    // const setLocale = (locale: SupportedLocale) =>
+    //     store.dispatch(UserText + '/' + setLocaleText, locale);
     const currentLanguage = computed<string>(
         () => languages.find((i) => i.payload == locale.value)?.title ?? languages[0].title,
     );
@@ -222,7 +194,7 @@
 
     onMounted(() => {
         console.log("onMounted")
-        test();
+        // test();
         doInitAuth();
         refreshMenu(); // 高亮当前选中的 tab
         // 动态检测宽度
@@ -232,37 +204,18 @@
     });
 
     const test = async () => {
-        const {ethos} = useEthosForVue();
-        console.log("ethos",ethos)
-        console.log("ethos",ethos.status)
 
-        // Generate a new Ed25519 Keypair
-        // const keypair = new Ed25519Keypair();
-        // const provider = new JsonRpcProvider();
-        // const signer = new RawSigner(keypair, provider);
     }
 
     const showedUsername = computed<string>(() => {
         if (!signedIn.value) return ''; // 没有登录返回空，按道理显示登录按钮不会调用本方法的
         let name = '';
         if (userInfo.value.name) name = userInfo.value.name;
-        return showUsername(name, principal.value);
+        return showUsername(name, address.value);
     });
-
-    const comingSoon = () =>
-        // 路径不全的 就当做还未完成
-        ElMessage({
-            // showClose: true,
-            message: `${t('message.tip.comingSoon')}`,
-            customClass:"i-message iconfont icon-development",
-            center: true,
-            type: '' as 'info',
-            duration: 2000,
-        });
 
     const chooseTab = (i: number, item: { action: string }) => {
         if (item.action === '') {
-            comingSoon();
             return;
         }
         if (item.action.startsWith('http')) {
@@ -277,20 +230,31 @@
 
     const refreshUserInfo = (UserInfoElement: UserInfoElement) => {
         if (UserInfoElement.name) userInfo.value.name = UserInfoElement.name;
-        setUserInfo(UserInfoElement);
+        userStore.setUserInfo(UserInfoElement);
     };
 
     const toProfile = () => {
         router.push({
-            path: '/person/profile/' + principal.value,
+            path: '/person/profile/' + address.value,
         });
     }
 
     const doInitAuth = () => {
+        // const { wallet } = ethos
+        // if (!wallet) return;
+        // console.log("ethos",ethos)
+        // console.log("wallet",wallet.address)
     };
 
     const onLogin = async () => {
-
+        requestWalletAccess('suiWallet')
+        // console.log("ethos",ethos)
+        // console.log("status",ethos.status)
+        // const { wallet } = ethos
+        // if (!wallet) return;
+        // const { suiBalance, tokens, nfts } = wallet.contents;
+        // console.log("suiBalance",suiBalance)
+        registerUser('1');
     };
 
     const onLogOut = async () => {
@@ -308,7 +272,8 @@
             current = languages[0].payload;
         }
         // console.error('set locale', current);
-        setLocale(current);
+        console.log("nav",locale.value)
+        userStore.setLocale(current);
     };
 
     const onHome = () => router.push('/');
@@ -419,19 +384,16 @@
                     .login {
                         > div {
                             margin: 0 auto;
-                            background-color: #06f;
+                            background: linear-gradient(to right, #2f7dff, 80%, #409eff);
+                            border-radius: 4px;
                             width: 114px;
                             height: 40px;
-                            border-radius: 30px;
                             display: flex;
                             flex-direction: row;
                             align-items: center;
                             justify-content: center;
                             cursor: pointer;
-                            &:hover {
-                                border-color: #005ce6;
-                                background-color: #005ce6;
-                            }
+
                             > div {
                                 font-size: 22px;
                                 line-height: 30px;

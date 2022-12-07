@@ -79,22 +79,10 @@
                                       show-word-limit
                                       :placeholder="$t('post.help.participants.placeholder')">
                                 <template #append>
-                                    <el-button :icon="Close" @click.prevent="removeItem(index)"></el-button>
+                                    <el-button :icon="Close" @click.prevent="removeItem(index)"/>
                                 </template>
                             </el-input>
                         </el-form-item>
-                        <!--<el-form-item :label="$t('post.help.endTime.label')">-->
-                        <!--<el-config-provider :locale="elementPlusLocale">-->
-                        <!--<el-date-picker-->
-                        <!--v-model="form.end_time[0]"-->
-                        <!--type="datetime"-->
-                        <!--:placeholder="$t('post.help.endTime.placeholder')"-->
-                        <!--popper-class="i-date-pop"-->
-                        <!--:editable="false"-->
-                        <!--value-format="x"-->
-                        <!--/>-->
-                        <!--</el-config-provider>-->
-                        <!--</el-form-item>-->
                     </el-form>
                     <div style="display: flex;justify-content: space-between">
                         <el-button @click="addParticipants">{{t('post.help.participants.add')}}</el-button>
@@ -110,7 +98,7 @@
 </template>
 
 <script lang="ts" setup>
-    import {ref, onMounted, computed, nextTick} from 'vue';
+    import {ref, onMounted, watch, computed, nextTick} from 'vue';
     import Navigator from '@/components/navigator/Navigator.vue';
     import {
         ElRow, ElCol, ElButton, ElSelect, ElOption, ElForm, ElFormItem, ElInput, ElMessage, ElConfigProvider,
@@ -118,25 +106,19 @@
     } from 'element-plus/es';
     import {Close} from '@element-plus/icons-vue';
     import type {FormInstance, FormRules} from 'element-plus'
-    import {SupportedLocale, t} from '@/locale';
+    import {t} from '@/locale';
     import {Quill, QuillEditor} from '@vueup/vue-quill';
     import ImageUploader from "quill-image-uploader";
-    import {useRoute, useRouter} from 'vue-router';
-    import en from 'element-plus/lib/locale/lang/en';
-    import zhCn from 'element-plus/lib/locale/lang/zh-cn';
-    import {useStore} from "vuex";
+    import {useRouter} from 'vue-router';
     import {goBack} from "@/router/routers";
-    import {showMessageError, showMessageSuccess} from "@/utils/message";
+    import {showMessageError} from "@/utils/message";
     import {calculatedICPIdLength, uploadImage} from "@/utils/images";
+    import { useUserStore } from "@/stores/user";
 
-    const store = useStore();
+    const userStore = useUserStore();
     const router = useRouter();
-    const route = useRoute();
 
-    // const locale = computed<SupportedLocale>(() => {
-    //     return store.state.user.locale
-    // });
-    const currentUserPrincipal = computed<string>(() => store.state.user.principal);
+    const currentUserPrincipal = computed<string>(() => userStore.address);
     const loading = ref(false);
     //编辑器是否发生变化
     const isEditorChange = ref(false);
@@ -165,10 +147,10 @@
     }, {
         value: "Law",
         label: t('post.help.category.law')
-    },  {
+    }, {
         value: "Safeguard",
         label: t('post.help.category.safeguard')
-    },  {
+    }, {
         value: "Blacklist",
         label: t('post.help.category.blacklist')
     }, {
@@ -200,7 +182,7 @@
                 upload: (file) => {
                     return new Promise((resolve, reject) => {
                         uploadImage(file).then(res => {
-                                if (res!=='') {
+                                if (res !== '') {
                                     resolve(res)
                                 } else {
                                     reject()
@@ -216,19 +198,30 @@
         theme: 'snow', //主题 snow/bubble
         syntax: true, //语法检测
     };
-    // 日期选择器需要用到的方法，目前不需要日期选择器，所以注释了
-    // const elementPlusLocale = computed(() => {
-    //     switch (locale.value) {
-    //         case SupportedLocale.zhCN:
-    //             return zhCn;
-    //         default:
-    //             return en;
-    //     }
-    // });
 
     onMounted(() => {
         init()
     });
+
+    const saveDraftBox = () => {
+        //存草稿箱
+        if (showEditorLength.value > 0) {
+            localStorage.setItem('postDraftBox', JSON.stringify(form.value));
+        }
+    }
+
+    const getDraftBox = () => {
+        //读取并设置草稿箱中的内容
+        const item = localStorage.getItem('postDraftBox');
+        if (!item) {
+            return
+        }
+        const postDraftBox = JSON.parse(item);
+        if (postDraftBox && myTextEditor.value) {
+            form.value = postDraftBox;
+            myTextEditor.value.setHTML(form.value.content.content);
+        }
+    }
 
     const showEditorLength = computed(() => {
         const length = calculatedICPIdLength(form.value.content.content);
@@ -239,7 +232,6 @@
     const addParticipants = () => {
         form.value.participants.push("");
     }
-
 
     const removeItem = (index) => {
         if (index !== -1) {
@@ -263,12 +255,21 @@
                     //结束时间，暂时没用了
                     post.end_time[0] *= 1000 * 1000;
                 }
-                //submit
+               //submit
             } else {
                 console.error('error submit!', fields)
             }
         })
     }
+
+    watch(
+        () => form,
+        () => {
+            //监听form对象，有变动就存草稿箱。
+            saveDraftBox();
+        },
+        {deep: true}
+    );
 
     const init = () => {
         console.log("currentUserPrincipal.value", currentUserPrincipal.value)
@@ -284,6 +285,7 @@
                 }
             });
         }, 1500);
+        getDraftBox();
     }
 
 </script>
@@ -291,11 +293,11 @@
 <style lang="scss">
     .post-submit-container {
         /* 当页面宽度小于426px*/
-        @media screen and (max-width:426px) {
-            .container{
+        @media screen and (max-width: 426px) {
+            .container {
                 padding: 0 10px;
             }
-            .post-form .el-form-item{
+            .post-form .el-form-item {
                 display: block;
             }
         }

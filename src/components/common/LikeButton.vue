@@ -1,8 +1,8 @@
 <template>
     <div class="like-button flex-y-center"
-         :class="{ 'like-button-not-clickable': !currentUserPrincipal }"
+         :class="{ 'like-button-not-clickable': isDisabled }"
          @click.stop="onClick">
-        <i v-if="!isLike" class="iconfont icon-like"></i>
+        <i v-if="!isLiked" class="iconfont icon-like"></i>
         <i v-else class="iconfont icon-like-filled"></i>
         {{props.likeCount}}
     </div>
@@ -10,9 +10,9 @@
 
 <script lang="ts" setup>
     import {ref, defineProps, onMounted, computed} from 'vue';
-    import {useStore} from "vuex";
+    import { useUserStore } from "@/stores/user";
 
-    const store = useStore();
+    const userStore = useUserStore();
     const props = defineProps({
         // 问题ID
         postId: {
@@ -29,36 +29,55 @@
             default: 0
         },
     });
-    const currentUserPrincipal = computed<string>(() => store.state.user.principal);
-    const isLike = ref(false);
+    const currentUserPrincipal = computed<string>(() => {
+        if (!userStore.address) {
+            isDisabled.value = true;
+        }
+        return userStore.address
+    });
+    const isDisabled = ref(false);
+    const isLiked = ref(false);
 
     const onClick = async () => {
         //根据是否点赞执行不同的方法
         //没登录不允许点赞
-        if (!currentUserPrincipal.value) {
+        if (isDisabled.value) {
             return
         }
-        if (isLike.value) {
+        if (isLiked.value) {
             //取消点赞
-            isLike.value = !isLike.value;
+            isLiked.value = !isLiked.value;
             //@ts-ignore
             props.likeCount--;
         } else {
             //没有点赞，就点赞
-            isLike.value = !isLike.value;
+            isLiked.value = !isLiked.value;
             //@ts-ignore
             props.likeCount++;
         }
+        clickLocked();
     }
 
-    const isLiked = () => {
-        if (!currentUserPrincipal.value) {
+    const isUserLiked = () => {
+        if (currentUserPrincipal.value && isDisabled.value) {
             return
         }
     }
 
+    const clickLocked = () => {
+        if (isDisabled.value) {
+            //如果已经是禁用状态就不锁定
+            return;
+        }
+        isDisabled.value = true;
+        setTimeout(() => {
+            //计时器，点赞后1.5s内不能再点赞
+            isDisabled.value = false;
+        }, 1500);
+    }
+
     onMounted(() => {
-        isLiked();
+        isUserLiked();
     });
 
 </script>
