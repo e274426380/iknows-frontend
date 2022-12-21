@@ -1,4 +1,4 @@
-import { UserInfo } from '@/types/user';
+import { UserInitInfo } from '@/types/user';
 
 // 本地保存语言选择
 export const setLocaleStorage = (locale: string): void => {
@@ -11,15 +11,15 @@ export const getLocaleStorage = (): string => {
 };
 
 // 本地保存用户信息，没有网络访问时也可以显示
-export const setUserInfoStorage = (user: UserInfo): void => {
+export const setUserInfoStorage = (user: UserInitInfo): void => {
     localStorage.setItem(`USER_${user.owner.toUpperCase()}`, JSON.stringify(user));
 };
 // get方法注意缓存清没清
-export const getUserInfoStorage = (principal: string): UserInfo | null => {
+export const getUserInfoStorage = (principal: string): UserInitInfo | null => {
     const info = localStorage.getItem(`USER_${principal.toUpperCase()}`);
     if (null == info) return null;
     try {
-        const read = JSON.parse(info) as UserInfo;
+        const read = JSON.parse(info) as UserInitInfo;
         return read;
     } catch (e) {
         console.error(`read user ${principal} info failed:`, e);

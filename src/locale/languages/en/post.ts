@@ -19,6 +19,7 @@ export default {
     comments: "Comments",
     commentPlaceholder: "Please enter your comment...",
     submitComment: "Submit Comment",
+    submit: "Submit",
     item: " ",
     joined: "Joined",
     public: {
@@ -27,6 +28,9 @@ export default {
             "Users on iKnows engage in low-threshold interactions, including but not limited to spreading knowledge, " +
             "asking questions and solving others' problems. " +
             "If needed, users can get assistance from professionals and financial support from the platform through DAO proposals."
+    },
+    draft: {
+        get: "Restore Unpublished Drafts......"
     },
     help: {
         search: "Search Title and Content",

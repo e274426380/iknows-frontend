@@ -1,9 +1,9 @@
-import {defineConfig, loadEnv, UserConfig} from 'vite';
+import { defineConfig, loadEnv, UserConfig } from 'vite';
 import path from 'path';
-import {JsonRpcProvider, Network, NETWORK_TO_API} from '@mysten/sui.js';
+import { NETWORK_TO_API } from '@mysten/sui.js';
 
-import {createVitePlugins} from './build/vite/plugins';
-import {ViteEnv} from './types/model';
+import { createVitePlugins } from './build/vite/plugins';
+import { ViteEnv } from './types/model';
 
 enum ConfigMode {
     development = 1, // 防止 0 情况 if 出错
@@ -13,21 +13,8 @@ enum ConfigMode {
     production,
 }
 
-// 测试用
-function testApi(){
-    // const provider = new JsonRpcProvider(Network.DEVNET);
-    // console.log("Network->",Network)
-    // provider.requestSuiFromFaucet(
-    //     '0x54fb68ff3d8b9003a55641756b819b4057d52978'
-    // ).then((res)=>{
-    //     console.log("getObject",res)
-    // });
-    // // console.log("provider->",provider)
-}
-
 // 输出配置文件
-export default defineConfig(({ command, mode }) => {
-    testApi();
+export default defineConfig(({command, mode}) => {
     console.log('command ->', command);
     console.log('mode ->', mode);
 
@@ -139,6 +126,7 @@ export default defineConfig(({ command, mode }) => {
             // serve 独有配置 开发模式
             ...common,
             server: {
+                port: 3001, //指定本地开发端口号
                 proxy: {
                     '/api': {
                         target: location,
@@ -161,7 +149,7 @@ export default defineConfig(({ command, mode }) => {
 // 获取后端运行地址，本地/在线
 function getLocation(viteEnv: ViteEnv): string {
     const position = viteEnv.VITE_NETWORK;
-    if (position==='local') {
+    if (position === 'local') {
         return NETWORK_TO_API.LOCAL.fullNode;
     }
     return NETWORK_TO_API.DEVNET.fullNode;

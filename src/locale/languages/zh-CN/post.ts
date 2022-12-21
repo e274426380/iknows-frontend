@@ -19,6 +19,7 @@ export default {
     commentPlaceholder: "请输入你的评论...",
     comments: "评论",
     submitComment: "提交评论",
+    submit: "提交",
     item: "条",
     joined: "加入于",
     public: {
@@ -26,6 +27,9 @@ export default {
         text: "iKnows是以知识为核心，通过问答社交的方式打造的去中心化应用平台。" +
             "用户在iKnows上进行低门槛的互动，包括但不限于传播知识，提出问题，解决他人问题等。" +
             "如果有需要，用户可以通过去中心化治理组织（DAO）提案，从平台中获取专业人士的协助和资金支持。",
+    },
+    draft: {
+        get: "恢复未发布的草稿......"
     },
     help: {
         search: "搜索标题和内容",

@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 import { changeLanguage, findLocaleByString, SupportedLocale } from "@/locale";
-import { UserInfo, UserInfoElement } from "@/types/user";
+import { UserInitInfo, UserInfoElement } from "@/types/user";
 import {
     deleteUserInfoStorage,
     getLocaleStorage,
@@ -8,22 +8,23 @@ import {
     setLocaleStorage,
     setUserInfoStorage
 } from "@/utils/storage";
+import { localStorageKeys } from "@/types/constants";
 
 interface UserState {
     locale: SupportedLocale | "";
-    address: string;
-    user: UserInfo;
+    address: any;
+    user: UserInitInfo;
 }
 
 //从缓存中读取userInfo
-const getUserInfoByState = function (address: string, user: UserInfo): UserInfo {
+const getUserInfoByState = function (address: string, user: UserInitInfo): UserInitInfo {
     // console.log("getUserInfoByState",state.address);
-    if (!address) return new UserInfo(); // 还没有设置 address 就都给空
+    if (!address) return new UserInitInfo(); // 还没有设置 address 就都给空
     if (user && user.owner == address) return user;
     // 缓存中没有，就读取
     let readUser = getUserInfoStorage(address);
     if (!readUser) {
-        readUser = new UserInfo(); // 如果没有就新建一个空的
+        readUser = new UserInitInfo(); // 如果没有就新建一个空的
         readUser.owner = address;
         setUserInfoStorage(readUser);
     }
@@ -33,8 +34,8 @@ const getUserInfoByState = function (address: string, user: UserInfo): UserInfo 
 export const useUserStore = defineStore('user', {
     state: (): UserState => ({
         locale: "",
-        address: "",
-        user: new UserInfo(),
+        address: localStorage.getItem(localStorageKeys.address),
+        user: new UserInitInfo(),
     }),
     getters: {
         getLocale: (state): SupportedLocale => {
@@ -42,7 +43,7 @@ export const useUserStore = defineStore('user', {
             state.locale = findLocaleByString(getLocaleStorage()); // 放入缓存
             return state.locale;
         },
-        getUserInfo: (state): UserInfo => {
+        getUserInfo: (state): UserInitInfo => {
             state.user = getUserInfoByState(state.address, state.user);
             return state.user
         },
@@ -55,7 +56,7 @@ export const useUserStore = defineStore('user', {
         },
         setAddress(address: string) {
             if (address === '') {
-                this.user = new UserInfo();
+                this.user = new UserInitInfo();
                 // 如果是清除用户登录信息 持久化的信息也应该清除
                 deleteUserInfoStorage(this.address);
                 this.address = address;
@@ -66,14 +67,14 @@ export const useUserStore = defineStore('user', {
             }
             // 当前 address 不用持久化
         },
-        setUserInfo(userInfo: UserInfoElement) {
-            this.user = {...this.user, ...userInfo};
+        setUserInfo(UserInitInfo: UserInfoElement) {
+            this.user = {...this.user, ...UserInitInfo};
             setUserInfoStorage(this.user);
         },
         setUsername(username: string) {
-            const userInfo = getUserInfoByState(this.address, this.user);
-            userInfo.name = username;
-            setUserInfoStorage(userInfo);
+            const UserInitInfo = getUserInfoByState(this.address, this.user);
+            UserInitInfo.name = username;
+            setUserInfoStorage(UserInitInfo);
         },
     }
 });

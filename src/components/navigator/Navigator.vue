@@ -118,7 +118,8 @@
                 </div>
             </div>
         </nav>
-        <el-backtop />
+        <el-backtop/>
+        <RegisterModal v-model:dialogVisible=registerDialogVisible />
     </div>
 </template>
 <script lang="ts" setup>
@@ -129,12 +130,14 @@
     import { useUserStore } from '@/stores/user'
     import { UserInfoElement } from "@/types/user";
     import { showUsername } from "@/common/utils";
-    import { registerUser } from "@/api/user";
     import { useWallet } from "@/common/wallet";
+    import RegisterModal from "./RegisterModal.vue";
+    import { getUserInfo } from "@/api/user";
+    import { getUser } from "@/common/auth";
 
     const userStore = useUserStore();
     const router = useRouter();
-    const {requestWalletAccess} = useWallet();
+    const {requestWalletAccess, verifyWalletPermissions} = useWallet();
     const props = defineProps({
         // II 认证成功 即 注册成功的回调
         loginInCallback: {
@@ -151,10 +154,9 @@
     // let auth = new Auth(); // 不能被 vue 代理，只能放到外面了
     const clientReady = ref(false);
     const signedIn = ref(false); // 是否登录
+    const registerDialogVisible = ref(false); // 注册弹窗显示
     const address = computed(() => userStore.address);
     const userInfo = computed(() => userStore.user);
-    // const setUserInfo = (userInfo: UserInfoElement) =>
-    //     store.dispatch(UserText + '/' + setUserInfoText, userInfo);
 
     const navbarRef = ref<HTMLElement | null>(null); // 导航栏ref属性
     const screenWidth = ref(document.documentElement.clientWidth); // 当前屏幕宽度
@@ -193,8 +195,6 @@
     };
 
     onMounted(() => {
-        console.log("onMounted")
-        // test();
         doInitAuth();
         refreshMenu(); // 高亮当前选中的 tab
         // 动态检测宽度
@@ -202,10 +202,6 @@
             screenWidth.value = document.documentElement.clientWidth;
         };
     });
-
-    const test = async () => {
-
-    }
 
     const showedUsername = computed<string>(() => {
         if (!signedIn.value) return ''; // 没有登录返回空，按道理显示登录按钮不会调用本方法的
@@ -247,14 +243,22 @@
     };
 
     const onLogin = async () => {
-        requestWalletAccess('suiWallet')
+        //验证是否连接过钱包，有就不用登录
+        if(await verifyWalletPermissions()) {
+            console.log("userInfo",await getUser(address.value))
+            return
+        }
+        requestWalletAccess('suiWallet').then(res => {
+            console.log("address",address.value)
+            registerDialogVisible.value = true;
+        })
         // console.log("ethos",ethos)
         // console.log("status",ethos.status)
         // const { wallet } = ethos
         // if (!wallet) return;
         // const { suiBalance, tokens, nfts } = wallet.contents;
         // console.log("suiBalance",suiBalance)
-        registerUser('1');
+        // registerUser('1');
     };
 
     const onLogOut = async () => {

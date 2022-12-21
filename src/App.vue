@@ -9,7 +9,6 @@
     const userStore = useUserStore();
 
     const locale = computed(() => userStore.getLocale);
-    console.log("app,locale",locale.value)
     // 设置语言 直接用 不用当成方法调用
     onMounted(() => changeLanguage(locale.value));
 </script>

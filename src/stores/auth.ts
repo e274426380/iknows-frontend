@@ -6,7 +6,7 @@ export const useAuthStore = defineStore({
     state: () => ({
         walletProvider: localStorage.getItem(localStorageKeys.walletProvider),
         hasWalletPermission: false,
-        userSuiAddress: localStorage.getItem(localStorageKeys.walletProvider),
+        userSuiAddress: localStorage.getItem(localStorageKeys.address),
         coins: [],
     }),
 

@@ -95,7 +95,8 @@
                 </el-col>
             </el-row>
             <div style="text-align: center" class="form-footer">
-                <el-button type="primary" class="submit-button" @click="submit(ruleFormRef)" :loading="loading">提交
+                <el-button type="primary" class="submit-button" @click="submit(ruleFormRef)" :loading="loading">
+                    {{t('post.submit')}}
                 </el-button>
             </div>
         </div>

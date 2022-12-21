@@ -29,7 +29,7 @@ export function useWallet() {
             localStorage.setItem(localStorageKeys.address, address);
             localStorage.setItem(localStorageKeys.walletProvider, provider);
         } else {
-            // address为null则为移除对应的地址
+            // 参数address为null则为移除对应的地址
             localStorage.removeItem(localStorageKeys.address);
             localStorage.removeItem(localStorageKeys.walletProvider);
         }
@@ -45,13 +45,20 @@ export function useWallet() {
     }
 
     //检查钱包权限是否正常
-    const verifyWalletPermissions = () => {
-        if (!authStore.walletProvider || !window[authStore.walletProvider]) return logout();
-
-        window[authStore.walletProvider].hasPermissions().then(res => {
-            if (!res) return logout();
+    const verifyWalletPermissions = async () => {
+        if (!authStore.walletProvider || !window[authStore.walletProvider]) {
+            logout()
+            return false;
+        }
+        return await window[authStore.walletProvider].hasPermissions().then(async res => {
+            if (!res) {
+                logout()
+                return false;
+            }
+            return true;
         }).catch(e => {
             logout();
+            return false;
         });
     }
 
@@ -91,14 +98,18 @@ export function useWallet() {
             return window.open(walletProviders[provider].url, '_blank').focus();
         }
         permissionGrantedError.value = "";
-        window[provider].requestPermissions().then(async res => {
+        return window[provider].requestPermissions().then(async res => {
             authStore.walletProvider = provider;
-            await window[provider].getAccounts().then(accounts => {
+            return await window[provider].getAccounts().then(accounts => {
                 updateSuiAddress(accounts[0], provider);
+                return true;
+            }).catch(e => {
+                return false
             });
         }).catch(e => {
             permissionGrantedError.value = `You need to give us ${walletProviders[provider].title} permissions to continue.`;
             updateSuiAddress(null);
+            return false;
         });
     }
     //
