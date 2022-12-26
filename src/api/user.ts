@@ -1,8 +1,10 @@
 import { getCache, TTL } from "@/common/cache";
-import { contractAddress, suiRpcUrl, userRegisterAddress } from "@/types/constants";
-import { JsonRpcProvider } from "@mysten/sui.js";
+import { contractAddress, userRegisterAddress } from "@/types/constants";
+import { getSuiUser } from "@/common/auth";
 
-const provider = new JsonRpcProvider(suiRpcUrl);
+const userTTL = TTL.hour1; //用户自身信息缓存时长。
+const ohterUserTTL = TTL.hour1; //其他用户信息缓存时长。
+
 // 注册用户接口
 export async function registerUser(username: string): Promise<any> {
     // if (!wallet) return
@@ -53,33 +55,12 @@ export async function registerUser(username: string): Promise<any> {
     }
 }
 // 获取目标用户信息
-export async function getUserInfo(address: string): Promise<any> {
-    return provider.getObjectsOwnedByAddress(address);
-}
-// 获取目标用户信息
-export async function getObject(objectId: string): Promise<any> {
-    // 参数只能传一个，不符合要求
-    // provider.getEvents({
-    //         MoveModule: {
-    //             package: contractAddress,
-    //             module: "user"
-    //         },
-    //         Sender: address
-    //     }, null, 10,
-    // ).then(res => {
-    //     console.log("getEvents", res)
-    // }).catch(e=>{
-    //     console.log("getEventsError", e)
-    // })
-    // 没法用
-    // provider.subscribeEvent({
-    //     MoveEventType: "0xd738deed998cdbd22ef8a87f875b16f03146e871::user::UserProfile"
-    // }, (event) => {
-    //     console.log("event", event)
-    // }).then(res => {
-    //     console.log("subscribeEvent", res)
-    // }).catch(e => {
-    //     console.error("subscribeEventError", e)
-    // })
-    return provider.getObject(objectId);
+export async function getUser(address: string): Promise<any> {
+    return await getCache({
+        key: 'USER_INFO_' + address.toUpperCase(),
+        execute: () => getSuiUser(address),
+        ttl: userTTL,
+        // ttl: 60 * 60, // 目前开发阶段先设置短的时间
+        isLocal: true, // 需要本地存储
+    });
 }

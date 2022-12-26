@@ -22,7 +22,7 @@
                                 <el-col :span="24" class="card-info">
                                     <Avatar :username="item.authorData && item.authorData.name!=='' ?
                                                 item.authorData.name : item.proposer.toString()"
-                                            :principalId=item.proposer.toString()
+                                            :addressId=item.proposer.toString()
                                             :clickable="false"
                                             :size="60"/>
                                     <div class="text">
@@ -31,7 +31,7 @@
                                             <DaoState :state="item.state"/>
                                         </div>
                                         <div class="info">
-                                            <Username :principalId="item.proposer.toString()"
+                                            <Username :addressId="item.proposer.toString()"
                                                       :username="item.authorData && item.authorData.name!==''
                                                       ? item.authorData.name: ''"/>
                                             <span>|</span>

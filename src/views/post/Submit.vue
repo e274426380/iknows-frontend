@@ -31,10 +31,10 @@
                                         message: $t('post.help.content.placeholder'),
                                         trigger: 'blur'}]"
                                       :class="{ isEditorError: isEditorErr }"
-                                      prop="content.content">
+                                      prop="detail">
                             <QuillEditor
                                 ref="myTextEditor"
-                                v-model:content="form.content.content"
+                                v-model:content="form.detail"
                                 contentType="html"
                                 :options="editorOption"
                                 @update:content="isEditorChange = true"
@@ -62,31 +62,7 @@
                                 />
                             </el-select>
                         </el-form-item>
-                        <el-form-item v-for="(item, index) in form.participants"
-                                      :key="index"
-                                      :prop="'participants.' + index"
-                                      :rules="[{
-                                        required: true,
-                                        message: $t('post.help.participants.placeholder'),
-                                        trigger: 'blur'}]"
-                                      prop="participants[0]">
-                            <template #label>
-                                <span v-if="index===0">{{$t('post.help.participants.label')}}</span>
-                                <span v-else></span>
-                            </template>
-                            <el-input v-model="form.participants[index]"
-                                      maxlength="30"
-                                      show-word-limit
-                                      :placeholder="$t('post.help.participants.placeholder')">
-                                <template #append>
-                                    <el-button :icon="Close" @click.prevent="removeItem(index)"/>
-                                </template>
-                            </el-input>
-                        </el-form-item>
                     </el-form>
-                    <div style="display: flex;justify-content: space-between">
-                        <el-button @click="addParticipants">{{t('post.help.participants.add')}}</el-button>
-                    </div>
                 </el-col>
             </el-row>
             <div style="text-align: center" class="form-footer">
@@ -115,11 +91,12 @@
     import { showMessageError, showMessageSuccess } from "@/utils/message";
     import { calculatedICPIdLength, uploadImage } from "@/utils/images";
     import { useUserStore } from "@/stores/user";
+    import { submitPost } from "@/api/post";
 
     const userStore = useUserStore();
     const router = useRouter();
 
-    const currentUserPrincipal = computed<string>(() => userStore.address);
+    const currentUserAddress = computed<string>(() => userStore.address);
     const loading = ref(false);
     //编辑器是否发生变化
     const isEditorChange = ref(false);
@@ -133,14 +110,11 @@
     const myTextEditor = ref<{ setHTML: Function; getText: Function } | null>(null);
     const form = ref({
         title: "",
-        content: {
-            content: "",
-            format: "html"
-        },
-        photos: [],
+        detail: "",
+        format: "html",
         category: "",
-        participants: [] as string[],//期待参与者
-        end_time: [] as number[],
+        photos: ['123'],
+        author_name:userStore.user.name,
     });
     const category = ref([{
         value: "Tech",
@@ -221,25 +195,15 @@
         if (postDraftBox && myTextEditor.value) {
             form.value = postDraftBox.form;
             showMessageSuccess(t('post.draft.get') + postDraftBox.time)
-            myTextEditor.value.setHTML(form.value.content.content);
+            myTextEditor.value.setHTML(form.value.detail);
         }
     }
 
     const showEditorLength = computed(() => {
-        const length = calculatedICPIdLength(form.value.content.content);
+        const length = calculatedICPIdLength(form.value.detail);
         length > limitLength ? (isEditorErr.value = true) : (isEditorErr.value = false);
         return length;
     });
-
-    const addParticipants = () => {
-        form.value.participants.push("");
-    }
-
-    const removeItem = (index) => {
-        if (index !== -1) {
-            form.value.participants.splice(index, 1)
-        }
-    }
 
     const submit = async (formEl: FormInstance | undefined) => {
         console.log("submit formEl", formEl)
@@ -252,12 +216,19 @@
                 });
                 loading.value = true;
                 console.log("form", form.value);
-                let post = {...form.value};
-                if (post.end_time[0]) {
-                    //结束时间，暂时没用了
-                    post.end_time[0] *= 1000 * 1000;
-                }
                 //submit
+                submitPost(form.value).then(res => {
+                    console.log(res);
+                    if (res.Ok) {
+                        showMessageSuccess(t('message.post.create'));
+                        router.push('/post/detail/' + Number(res.Ok));
+                        //发布成功后删除草稿箱里的内容。
+                        localStorage.removeItem('postDraftBox')
+                    }
+                }).finally(() => {
+                    loading.value = false;
+                    fullLoading.close();
+                })
             } else {
                 console.error('error submit!', fields)
             }
@@ -274,11 +245,11 @@
     );
 
     const init = () => {
-        console.log("currentUserPrincipal.value", currentUserPrincipal.value)
+        console.log("currentUserAddress.value", currentUserAddress.value)
         //验证是否登录
         setTimeout(() => {
             nextTick(() => {
-                if (!currentUserPrincipal.value) {
+                if (!currentUserAddress.value) {
                     showMessageError(t('message.error.noLogin'));
                     // setTimeout(() => {
                     //等用户看清了错误提示再弹

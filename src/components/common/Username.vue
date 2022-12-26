@@ -13,7 +13,7 @@
 
     const props = defineProps({
         // 必要的内容，显示哪些
-        principalId: {
+        addressId: {
             type: String,
             required: true,
         },
@@ -30,7 +30,7 @@
     });
 
     const showName = computed<string>(() => {
-        const m = showUsername(props.username, props.principalId);
+        const m = showUsername(props.username, props.addressId);
         return m ? m : 'null';
     });
 
@@ -38,7 +38,7 @@
         //可点击时执行方法
         if(props.clickable){
             try {
-                openTab('/person/profile/' + props.principalId)
+                openTab('/person/profile/' + props.addressId)
             } catch (e) {
                 console.error(e)
             }
@@ -46,7 +46,7 @@
     }
     //
     // watch(
-    //     () => props.principalId,
+    //     () => props.addressId,
     //     () => {
     //         console.log("props",props)
     //     },

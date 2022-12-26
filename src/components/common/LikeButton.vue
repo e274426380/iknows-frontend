@@ -29,7 +29,7 @@
             default: 0
         },
     });
-    const currentUserPrincipal = computed<string>(() => {
+    const currentUserAddress = computed<string>(() => {
         if (!userStore.address) {
             isDisabled.value = true;
         }
@@ -59,7 +59,7 @@
     }
 
     const isUserLiked = () => {
-        if (currentUserPrincipal.value && isDisabled.value) {
+        if (currentUserAddress.value && isDisabled.value) {
             return
         }
     }

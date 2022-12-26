@@ -33,7 +33,7 @@
         //可点击时执行方法
         if(props.clickable){
             try {
-                // openTab('/person/profile/' + props.principalId)
+                // openTab('/person/profile/' + props.addressId)
             } catch (e) {
                 console.error(e)
             }

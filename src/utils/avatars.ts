@@ -9,17 +9,17 @@ export function extractColorByName(name: string): string {
 }
 
 // 处理头像名字显示的逻辑
-export function showAvatarName(username: string, principalId: string) {
+export function showAvatarName(username: string, addressId: string) {
     if (username) {
         //只取首字母大写为头像名字
         return username.substring(0, 1).toUpperCase();
     }
-    //没有名字返回principalId首字母作为名字
-    return principalId ? principalId.substring(0, 1).toUpperCase() : '';
+    //没有名字返回addressId首字母作为名字
+    return addressId ? addressId.substring(0, 1).toUpperCase() : '';
 }
 
 // 处理用户名字显示的逻辑
-export function showUsername(username: string, principalId: string) {
+export function showUsername(username: string, addressId: string) {
     if (username) {
         const MAX_LENGTH = 15; // 显示的最长字符
         if (username.length >= MAX_LENGTH) {
@@ -27,7 +27,13 @@ export function showUsername(username: string, principalId: string) {
         }
         return username;
     }
-    //没有名字返回principalId作为名字，保留前5位，后3位
-    return principalId ? principalId.substring(0, 5) + "..." + principalId.substring(principalId.length - 3, principalId.length)
+    //没有名字返回addressId作为名字，保留前5位，后3位
+    return addressId ? addressId.substring(0, 5) + "..." + addressId.substring(addressId.length - 3, addressId.length)
         : "";
 }
+// 处理用户名字显示的逻辑
+export function getUserRegName(addressId: string) {
+    //返回addressId作为名字，保留前10位
+    return addressId.substring(0, 10)
+}
+

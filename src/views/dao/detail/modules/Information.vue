@@ -16,7 +16,7 @@
                         <b>{{t('dao.information.target')}}</b>
                         <div class="user">
                             <el-icon><UserFilled /></el-icon>
-                            <Username :principalId="proposal.payload.execute_args.AddGovernanceMember.id.toString()"
+                            <Username :addressId="proposal.payload.execute_args.AddGovernanceMember.id.toString()"
                                       :username="targetUser!==undefined && targetUser.name!==''
                                                       ? targetUser.name: ''"
                                       :clickable="true"/>

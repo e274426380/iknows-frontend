@@ -14,13 +14,13 @@
                         <div class="author">
                             <Avatar :username="item.authorData && item.authorData.name!=='' ?
                                 item.authorData.name : item.author.toString()"
-                                    :principalId=item.author.toString()
+                                    :addressId=item.author.toString()
                                     :clickable="false"
                                     :size="24"/>
                             <div class="authorName">
                                 <div>
                                     <b>
-                                        <Username :principalId="item.author.toString()"
+                                        <Username :addressId="item.author.toString()"
                                                   :username="item.authorData && item.authorData.name!==''
                                                       ? item.authorData.name: ''"/>
                                     </b>
@@ -34,7 +34,7 @@
                         {{item.content.content}}
                         <span class="reply-button" v-if="item.isReply" @click="replyOther(item)">{{t('post.cancelReply')}}</span>
                         <span class="reply-button" v-else @click="replyOther(item)">{{t('post.reply')}}</span>
-                        <DeleteButton v-if="props.currentUserPrincipal===item.author.toString()"
+                        <DeleteButton v-if="props.currentUserAddress===item.author.toString()"
                                       :id="Number(item.id)"
                                       :deleteFunction="deleteComment"
                                       :loading="deleteLoading"/>
@@ -91,7 +91,7 @@
             type: Boolean,
             required: true,
         },
-        currentUserPrincipal: {
+        currentUserAddress: {
             type: String,
             required: true,
         }
@@ -134,7 +134,7 @@
         for (let i = 0; i < showList.value.length; i++) {
             const quoteId = Number(showList.value[i].quote_id[0]);
             let quoteIndex: number = -1;
-            //查询是否有引用的评论，先把principalId加进去。
+            //查询是否有引用的评论，先把addressId加进去。
             if (quoteId && quoteId !== 0) {
                 showList.value.map((item, index) => {
                     if (Number(item.id) === quoteId) {

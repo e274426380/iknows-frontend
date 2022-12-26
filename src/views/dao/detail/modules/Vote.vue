@@ -49,7 +49,7 @@
     const voteOption = ref(false);
     const loading = ref(false);
     const props = defineProps({
-        principalId: {
+        addressId: {
             type: String,
             required: true,
         },

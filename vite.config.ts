@@ -43,7 +43,6 @@ export default defineConfig(({command, mode}) => {
 
     if (configMode !== ConfigMode.production) {
         // 开发模式总是有个 warning 不想看到
-        // canistersAlias['vue-i18n'] = 'vue-i18n/dist/vue-i18n.cjs.js';
     }
     mode = getMode(configMode);
     const isBuild = mode === 'production';

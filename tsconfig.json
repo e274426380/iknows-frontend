@@ -16,8 +16,6 @@
     "types": ["vite/client"],
     "paths": {
       "@/*": ["src/*"],
-      "canisters/backend": ["../services/.dfx/local/canisters/backend"],
-      "canisters/photo": ["../services/.dfx/local/canisters/photo"]
     }
   },
   "include": [

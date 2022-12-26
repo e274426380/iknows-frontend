@@ -1,6 +1,6 @@
 
 // 统一处理显示用户名的逻辑
-export function showUsername(username: string, principalId: string): string {
+export function showUsername(username: string, addressId: string): string {
     if (username) {
         const MAX_LENGTH = 15; // 显示的最长字符
         if (username.length >= MAX_LENGTH) {
@@ -8,7 +8,7 @@ export function showUsername(username: string, principalId: string): string {
         }
         return username;
     }
-    return principalId ? principalId.substring(0, 5).toUpperCase() + '...' : '';
+    return addressId ? addressId.substring(0, 5).toUpperCase() + '...' : '';
 }
 
 // 移除html标签，只保留文本内容

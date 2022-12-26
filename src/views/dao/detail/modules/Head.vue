@@ -7,7 +7,7 @@
                         <el-row justify="space-between">
                             <el-col :span="24" class="card-info">
                                 <Avatar :username="author && author.name ? author?.name : ''"
-                                        :principal-id=proposal.proposer.toString()
+                                        :address-id=proposal.proposer.toString()
                                         :avatar-id="Number(author?.avatar_id)"
                                         :clickable="false"
                                         :size="60"/>
@@ -17,7 +17,7 @@
                                         <DaoState :state="proposal.state"/>
                                     </div>
                                     <div class="info">
-                                        <Username :principalId="proposal.proposer.toString()"
+                                        <Username :addressId="proposal.proposer.toString()"
                                                   :username="author!==undefined && author.name!==''
                                                       ? author.name: ''"
                                                   :clickable="true"/>
@@ -48,8 +48,8 @@
                             <!--<span class="fold" @click="dialogVisible=true">{{t('common.delete.title')}}</span>-->
                             <!--</div>-->
                         </div>
-                        <Vote v-if="proposal.state.Open!==undefined && currentUserPrincipal"
-                              :principalId="currentUserPrincipal"
+                        <Vote v-if="proposal.state.Open!==undefined && currentUserAddress"
+                              :addressId="currentUserAddress"
                               :proposalId="proposalId"
                               @voteSuccess="voteSuccess"/>
                     </div>
@@ -91,7 +91,7 @@
 
     const isFold = ref(true);
     const proposalId = Number(route.params.id);
-    const currentUserPrincipal = computed<string>(() => userStore.address);
+    const currentUserAddress = computed<string>(() => userStore.address);
     const dialogVisible = ref(false);
     const loading = ref(false);
 

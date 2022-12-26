@@ -122,9 +122,9 @@ const setExpiredData = (key: string, value: any, ttl: number, isLocal: boolean):
         // console.log("value",value)
         if (typeof value === "bigint") {
             return Number(value) ;
-        } else if(typeof value === "object" && value?.constructor.name==='Principal'){
-            // 将Principal格式的value转换为字符串储存
-            // 以免JSON.stringify深拷贝时破坏Principal的constructor，导致无法转换成字符串
+        } else if(typeof value === "object" && value?.constructor.name==='Address'){
+            // 将Address格式的value转换为字符串储存
+            // 以免JSON.stringify深拷贝时破坏Address的constructor，导致无法转换成字符串
             return value.toString();
         }
         return value;

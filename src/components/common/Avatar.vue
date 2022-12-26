@@ -18,11 +18,10 @@ import { PropType, defineProps, ref, computed, watch, onMounted } from 'vue';
 import { extractColorByName, showAvatarName } from '@/utils/avatars';
 import { ElAvatar } from 'element-plus/es';
 import { openTab } from '@/router/routers';
-import { getUrlByPhotoServiceId } from '@/utils/images';
 
 const props = defineProps({
     // 必要的内容，显示哪些
-    principalId: {
+    addressId: {
         type: String,
         required: true,
     },
@@ -52,7 +51,7 @@ const props = defineProps({
 const imageSrc = ref('');
 
 const showAvatar = computed<string>(() => {
-    const m = showAvatarName(props.username, props.principalId);
+    const m = showAvatarName(props.username, props.addressId);
     return m ? m : 'A';
 });
 // 根据名字，定义头像颜色
@@ -85,7 +84,7 @@ const getAvatarSrc = () => {
     if (props.avatarUri) {
         imageSrc.value = props.avatarUri;
     } else if (props.avatarId) {
-        imageSrc.value = getUrlByPhotoServiceId(props.avatarId);
+        // imageSrc.value = getUrlByPhotoServiceId(props.avatarId);
     } else {
         imageSrc.value = '';
     }
@@ -97,7 +96,7 @@ const onClick = () => {
     if (props.clickCallback) {
         props.clickCallback.call(null);
     } else {
-        openTab(location.origin + '/person/profile/' + props.principalId);
+        openTab(location.origin + '/person/profile/' + props.addressId);
     }
 };
 </script>

@@ -64,10 +64,10 @@
     const loading = ref(false);
     const list = ref<ApiProfilePost[]>([]);
 
-    const targetPrincipal = ref('');
+    const targetAddress = ref('');
 
     onMounted(() => {
-        targetPrincipal.value = route.params.principal.toString() || '';
+        targetAddress.value = route.params.address.toString() || '';
         init()
     });
 

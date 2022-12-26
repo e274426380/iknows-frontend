@@ -12,23 +12,25 @@ export const getLocaleStorage = (): string => {
 
 // 本地保存用户信息，没有网络访问时也可以显示
 export const setUserInfoStorage = (user: UserInitInfo): void => {
-    localStorage.setItem(`USER_${user.owner.toUpperCase()}`, JSON.stringify(user));
+    if (user.sui_wallet !== "") {
+        localStorage.setItem(`USER_${user.sui_wallet.toUpperCase()}`, JSON.stringify(user));
+    }
 };
 // get方法注意缓存清没清
-export const getUserInfoStorage = (principal: string): UserInitInfo | null => {
-    const info = localStorage.getItem(`USER_${principal.toUpperCase()}`);
+export const getUserInfoStorage = (address: string): UserInitInfo | null => {
+    const info = localStorage.getItem(`USER_${address.toUpperCase()}`);
     if (null == info) return null;
     try {
         const read = JSON.parse(info) as UserInitInfo;
         return read;
     } catch (e) {
-        console.error(`read user ${principal} info failed:`, e);
+        console.error(`read user ${address} info failed:`, e);
     }
     return null;
 };
 
-export const deleteUserInfoStorage = (principal: string): void => {
-    localStorage.removeItem(`USER_${principal.toUpperCase()}`);
+export const deleteUserInfoStorage = (address: string): void => {
+    localStorage.removeItem(`USER_${address.toUpperCase()}`);
 };
 
 // 保存钱包链接对象到 session

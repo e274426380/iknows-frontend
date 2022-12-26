@@ -65,7 +65,7 @@
                         </ul>
                     </div>
                     <!-- Login -->
-                    <div class="login">
+                    <div class="login" v-if="!signedIn">
                         <div
                             :class="{ zhCn: t(currentLanguage) === '简体中文' }"
                             @click="onLogin"
@@ -76,7 +76,7 @@
                         </div>
                     </div>
                     <!-- username -->
-                    <div class="user" v-if="signedIn">
+                    <div class="user" v-else-if="signedIn">
                         <el-dropdown :hide-timeout="80">
                             <span class="username">
                                 {{ showedUsername }}
@@ -132,12 +132,13 @@
     import { showUsername } from "@/common/utils";
     import { useWallet } from "@/common/wallet";
     import RegisterModal from "./RegisterModal.vue";
-    import { getUserInfo } from "@/api/user";
-    import { getUser } from "@/common/auth";
+    import { getUser } from "@/api/user";
+    import { useAuthStore } from "@/stores/auth";
 
     const userStore = useUserStore();
+    const authStore = useAuthStore();
     const router = useRouter();
-    const {requestWalletAccess, verifyWalletPermissions} = useWallet();
+    const {requestWalletAccess, verifyWalletPermissions, logout, getAddress} = useWallet();
     const props = defineProps({
         // II 认证成功 即 注册成功的回调
         loginInCallback: {
@@ -150,8 +151,6 @@
         }
     });
 
-    // 与 II 认证相关的信息
-    // let auth = new Auth(); // 不能被 vue 代理，只能放到外面了
     const clientReady = ref(false);
     const signedIn = ref(false); // 是否登录
     const registerDialogVisible = ref(false); // 注册弹窗显示
@@ -220,8 +219,27 @@
             router.push(item.action);
         }
     };
-    //从后台获取用户信息，并且设置
-    const getUserInfoFromServices = () => {
+    //获取用户信息，并且设置
+    const getUserInfoFromServices = async () => {
+        console.log("getUserInfoFromServices address.value",address.value)
+        if (!address.value) {
+            await getAddress();
+        }
+        await getUser(address.value).then(res => {
+            if (res.Ok) {
+                const user = res.Ok;
+                if (user.name !== "") {
+                    refreshUserInfo({
+                        name: user.name,
+                        sui_wallet: user.sui_wallet
+                    })
+                    signedIn.value = true;
+                }
+            }else {
+                //没有注册自动打开注册框。
+                registerDialogVisible.value = true;
+            }
+        });
     };
 
     const refreshUserInfo = (UserInfoElement: UserInfoElement) => {
@@ -235,33 +253,32 @@
         });
     }
 
-    const doInitAuth = () => {
-        // const { wallet } = ethos
-        // if (!wallet) return;
-        // console.log("ethos",ethos)
-        // console.log("wallet",wallet.address)
+    const doInitAuth = async () => {
+        getUserInfoFromServices();
     };
 
     const onLogin = async () => {
+        console.log("verifyWalletPermissions",await verifyWalletPermissions())
         //验证是否连接过钱包，有就不用登录
-        if(await verifyWalletPermissions()) {
-            console.log("userInfo",await getUser(address.value))
+        if (await verifyWalletPermissions()) {
+            getUserInfoFromServices()
             return
         }
+        //没有连接过再请求钱包连接
         requestWalletAccess('suiWallet').then(res => {
-            console.log("address",address.value)
-            registerDialogVisible.value = true;
+            console.log("requestWalletAccess", res)
+            console.log("requestWalletAccess address", address.value)
+            getUserInfoFromServices().then(() => {
+                if (userInfo.value.name === '') {
+                    registerDialogVisible.value = true;
+                }
+            });
         })
-        // console.log("ethos",ethos)
-        // console.log("status",ethos.status)
-        // const { wallet } = ethos
-        // if (!wallet) return;
-        // const { suiBalance, tokens, nfts } = wallet.contents;
-        // console.log("suiBalance",suiBalance)
-        // registerUser('1');
     };
 
     const onLogOut = async () => {
+        logout();
+        signedIn.value = false;
     };
 
     const onChangeLanguage = () => {

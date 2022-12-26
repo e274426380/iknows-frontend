@@ -37,13 +37,14 @@
     import { t } from '@/locale';
     import { registerUser } from "@/api/user";
     import { useUserStore } from "@/stores/user";
+    import { getUserRegName } from "@/utils/avatars";
 
     const userStore = useUserStore();
     const emit = defineEmits(['update:dialogVisible']);
     const loading = ref(false)
     // const username = ref(userStore.address)
     const form = ref({
-        username: userStore.address
+        username: "User"+getUserRegName(userStore.address)
     });
     const ruleFormRef = ref<FormInstance>();
     const props = defineProps({
@@ -58,7 +59,12 @@
         await formEl.validate((valid, fields) => {
             if (valid) {
                 registerUser(form.value.username).then(res=>{
-
+                    if(res.effects.status.status==="success"){
+                        //登录成功，刷新导航条
+                        onClose();
+                    } else {
+                        //报错，可能是重复注册的原因
+                    }
                 });
             }else {
                 console.error('error submit!', fields)
@@ -68,8 +74,6 @@
 
     const onClose = () => {
         emit('update:dialogVisible');
-        //关闭时清空输入，先别启用，感觉不友好
-        // replyReply.value = "";
     }
 
 

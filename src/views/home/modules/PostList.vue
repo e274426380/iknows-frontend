@@ -33,7 +33,7 @@
                                 <el-col :span="20" class="card-info">
                                     <Avatar :username="item.authorData && item.authorData.name!=='' ?
                                                 item.authorData.name : item.author.toString()"
-                                            :principalId=item.author.toString()
+                                            :addressId=item.author.toString()
                                             :clickable="false"
                                             :size="60"/>
                                     <div class="text">
@@ -46,7 +46,7 @@
                                             <span class="post-status closed" v-else-if="item.status.Closed!==undefined">{{t('common.status.closed')}}</span>
                                         </div>
                                         <div class="info">
-                                            <Username :principalId="item.author.toString()"
+                                            <Username :addressId="item.author.toString()"
                                                       :username="item.authorData && item.authorData.name!==''
                                                       ? item.authorData.name: ''"/>
                                             <span>|</span>

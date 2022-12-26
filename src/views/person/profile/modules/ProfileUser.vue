@@ -4,7 +4,7 @@
             <el-row>
                 <el-col :sm={span:3,offset:3} :xs="24" class="avatar">
                     <Avatar :username=user.name
-                            :principal-id=targetPrincipal
+                            :address-id=targetAddress
                             :avatar-id="0"
                             :clickable="false"
                             :size="120"/>
@@ -16,7 +16,7 @@
                                 <el-icon>
                                     <UserFilled/>
                                 </el-icon>
-                                <span v-if="!user.name"> {{ targetPrincipal }}</span>
+                                <span v-if="!user.name"> {{ targetAddress }}</span>
                                 <span v-else>{{user.name}}</span>
                             </div>
                             <el-button v-if="isOwner" @click="dialogFormVisible = true">
@@ -24,8 +24,8 @@
                             </el-button>
                         </el-row>
                         <el-row>
-                            <span class="principal" @click="copyPrincipal">{{ targetPrincipal }}</span>
-                            <el-icon class="copy" @click="copyPrincipal"><CopyDocument /></el-icon>
+                            <span class="address" @click="copyAddress">{{ targetAddress }}</span>
+                            <el-icon class="copy" @click="copyAddress"><CopyDocument /></el-icon>
                         </el-row>
                         <el-row v-if="user.location">
                             <el-icon><LocationFilled/></el-icon>
@@ -71,7 +71,7 @@
     </div>
     <el-dialog v-model="dialogFormVisible" custom-class="user-edit-dialog" :title="t('user.editInfo')" width="30%">
         <Avatar :username=form.name
-                :principal-id=targetPrincipal
+                :address-id=targetAddress
                 :avatar-id="0"
                 :clickable="false"
                 :size="100"/>
@@ -203,16 +203,16 @@
         created_at: 0,
         interests: []
     });
-    const currentUserPrincipal = computed<string>(() => userStore.address);
-    const targetPrincipal = ref('');
+    const currentUserAddress = computed<string>(() => userStore.address);
+    const targetAddress = ref('');
     // 是否是本人。关联编辑按钮的显示与否
     const isOwner = computed<boolean>(
-        () => currentUserPrincipal.value === targetPrincipal.value
+        () => currentUserAddress.value === targetAddress.value
     );
     const loading = ref(false);
 
     onMounted(() => {
-        initPrincipal();
+        initAddress();
         initUser();
         initReputation();
     });
@@ -221,29 +221,29 @@
        //get
     }
 
-    const copyPrincipal = async () => {
+    const copyAddress = async () => {
         try {
-            await toClipboard(targetPrincipal.value)
-            showMessageSuccess(t('message.copy.success',{item:"Principal"}))
+            await toClipboard(targetAddress.value)
+            showMessageSuccess(t('message.copy.success',{item:"Address"}))
         } catch (e) {
             console.error(e)
         }
     }
 
-    const initPrincipal = () => {
-        // 获取 路由中的principal
-        const principal = route.params.principal;
-        targetPrincipal.value = principal.toString() || '';
-        if (!targetPrincipal.value) {
-            targetPrincipal.value = currentUserPrincipal.value;
+    const initAddress = () => {
+        // 获取 路由中的address
+        const address = route.params.address;
+        targetAddress.value = address.toString() || '';
+        if (!targetAddress.value) {
+            targetAddress.value = currentUserAddress.value;
         }
-        // console.log('target principal', targetPrincipal.value);
-        // console.log('current user principal', currentUserPrincipal.value);
-        if (!targetPrincipal.value) {
-            // 既没有登录也没有目标的 principal 就跳转首页
+        // console.log('target address', targetAddress.value);
+        // console.log('current user address', currentUserAddress.value);
+        if (!targetAddress.value) {
+            // 既没有登录也没有目标的 address 就跳转首页
             console.log(
-                'person profile: target principal is empty. goto home',
-                currentUserPrincipal.value,
+                'person profile: target address is empty. goto home',
+                currentUserAddress.value,
             );
             // router.push('/');
             return;
@@ -318,7 +318,7 @@
                     margin-bottom: 5px;
                     align-items: center;
                 }
-                .principal{
+                .address{
                     cursor: pointer;
                 }
                 .copy{

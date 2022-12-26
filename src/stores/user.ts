@@ -20,18 +20,19 @@ interface UserState {
 const getUserInfoByState = function (address: string, user: UserInitInfo): UserInitInfo {
     // console.log("getUserInfoByState",state.address);
     if (!address) return new UserInitInfo(); // 还没有设置 address 就都给空
-    if (user && user.owner == address) return user;
+    if (user && user.sui_wallet == address) return user;
     // 缓存中没有，就读取
     let readUser = getUserInfoStorage(address);
     if (!readUser) {
         readUser = new UserInitInfo(); // 如果没有就新建一个空的
-        readUser.owner = address;
+        readUser.sui_wallet = address;
         setUserInfoStorage(readUser);
     }
     return readUser;
 };
 
-export const useUserStore = defineStore('user', {
+export const useUserStore = defineStore({
+    id: 'user',
     state: (): UserState => ({
         locale: "",
         address: localStorage.getItem(localStorageKeys.address),

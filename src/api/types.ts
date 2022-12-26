@@ -14,7 +14,7 @@ export type ApiError = {
     ProposalDeadlineOutOfDate: null;
     MemberNotFound: null;
     MemberAlreadyExists: null;
-    MemberPrincipalWrongFormat: null;
+    MemberAddressWrongFormat: null;
     AnswerWithCommentCantDelete: null; //有评论的回答不能删除
 };
 
@@ -65,7 +65,7 @@ export type PostCategory = {
 
 export type ApiUserInfo = {
     id: bigint; //id
-    owner: string; // 用户principal，唯一。从后端接受时是principal格式，再通过toString显示成字符串格式。
+    sui_wallet: string; // 用户钱包地址
     email: string;
     name: string;
     memo: string;
@@ -109,7 +109,7 @@ export type ApiPostTimeline = {
 }
 
 export type ApiPostComments = {
-    author: string; // 作者principalID
+    author: string; // 作者addressID
     authorData?: ApiUserInfo; //作者详细资料 通过id获取对应资料
     comment_id: number[];
     comments: [];
@@ -123,7 +123,7 @@ export type ApiPostComments = {
 }
 
 export type ApiProfilePost = {
-    author?: string; // 作者principalID
+    author?: string; // 作者addressID
     content: RichText;
     comments?: [];
     length?: number;
@@ -135,12 +135,12 @@ export type ApiProfilePost = {
 }
 
 export type UserReputation = {
-    user: string; // 用户principalID
+    user: string; // 用户addressID
     amount: bigint; //积分值
 }
 //DAO成员信息
 export type GovernanceMember = {
-    user: string; // 用户principalID
+    user: string; // 用户addressID
     created_at: bigint; //创建时间
 }
 

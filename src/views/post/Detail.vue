@@ -7,7 +7,7 @@
             <TimeLine :postId="postId" @changeStatusSuccess="init" :isOwner="isOwner"/>
             <Reply :postId="postId" :answerId="post.answer.length>0 ? Number(post.answer[0]) : undefined" ref="reply"
                    :isOwner="isOwner"
-                   :currentUserPrincipal="currentUserPrincipal"/>
+                   :currentUserAddress="currentUserAddress"/>
         </div>
     </div>
 </template>
@@ -27,12 +27,12 @@
     const route = useRoute();
     const userStore = useUserStore();
     const postId = Number(route.params.id);
-    const currentUserPrincipal = computed<string>(() => userStore.address);
+    const currentUserAddress = computed<string>(() => userStore.address);
     // 是否是本人 或者是管理员。关联编辑，删除按钮的显示与否
     // 本地环境下，authorId和currentId会有冲突。
     const isOwner = computed(() => {
         if (post.value) {
-            return currentUserPrincipal.value === post.value.author.toString()
+            return currentUserAddress.value === post.value.author.toString()
         }
         return false;
     });

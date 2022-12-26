@@ -7,7 +7,7 @@
                         <el-row justify="space-between">
                             <el-col :span="20" class="card-info">
                                 <Avatar :username="author && author.name ? author?.name : ''"
-                                        :principal-id=post.author.toString()
+                                        :address-id=post.author.toString()
                                         :avatar-id="Number(author?.avatar_id)"
                                         :clickable="false"
                                         :size="60"/>
@@ -20,7 +20,7 @@
                                         <span class="post-status closed" v-else-if="post.status.Closed!==undefined">{{t('common.status.closed')}}</span>
                                     </div>
                                     <div class="info">
-                                        <Username :principalId="post.author.toString()"
+                                        <Username :addressId="post.author.toString()"
                                                   :username="author!==undefined && author.name!==''
                                                       ? author.name: ''"
                                                 :clickable="true"/>

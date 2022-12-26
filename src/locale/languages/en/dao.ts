@@ -18,7 +18,7 @@ export default {
         },
         related: {
             label: "Related People：",
-            placeholder: "Please Enter the PrincipalId of the Person involved in the Proposal",
+            placeholder: "Please Enter the AddressId of the Person involved in the Proposal",
             add: "Add Proposal-Related People"
         },
         deadline: {

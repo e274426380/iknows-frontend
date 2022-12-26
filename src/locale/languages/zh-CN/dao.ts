@@ -18,7 +18,7 @@ export default {
         },
         related: {
             label: "提案相关人：",
-            placeholder: "请输入提案相关人的principalId",
+            placeholder: "请输入提案相关人的addressId",
             add: "增加提案相关人"
         },
         deadline: {

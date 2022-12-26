@@ -127,7 +127,7 @@
     const router = useRouter();
 
     const locale = computed(() => userStore.getLocale);
-    const currentUserPrincipal = computed<string>(() => userStore.address);
+    const currentUserAddress = computed<string>(() => userStore.address);
     const loading = ref(false);
     //编辑器是否发生变化
     const isEditorChange = ref(false);
@@ -146,7 +146,7 @@
             format: "html"
         },
         action: "",
-        related: "",// 提案目标的principalId，每次提案只能有一个人
+        related: "",// 提案目标的addressId，每次提案只能有一个人
         deadline: "",
     });
     const action = ref([{
@@ -248,11 +248,11 @@
     }
 
     const init = () => {
-        console.log("currentUserPrincipal.value", currentUserPrincipal.value)
+        console.log("currentUserAddress.value", currentUserAddress.value)
         //验证是否登录
         setTimeout(() => {
             nextTick(() => {
-                if (!currentUserPrincipal.value) {
+                if (!currentUserAddress.value) {
                     showMessageError(t('message.error.noLogin'));
                     // setTimeout(() => {
                     //等用户看清了错误提示再弹

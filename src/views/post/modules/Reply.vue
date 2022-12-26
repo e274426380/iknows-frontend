@@ -23,11 +23,11 @@
                                 <div class="flex">
                                     <Avatar :username="item.authorData && item.authorData.name!=='' ?
                                             item.authorData.name : item.author.toString()"
-                                            :principalId=item.author.toString()
+                                            :addressId=item.author.toString()
                                             :size="38"/>
                                     <div class="authorName">
                                         <b>
-                                            <Username :principalId="item.author.toString()"
+                                            <Username :addressId="item.author.toString()"
                                                       :username="item.authorData && item.authorData.name!==''
                                                       ? item.authorData.name: ''"/>
                                         </b>
@@ -75,7 +75,7 @@
                                             </div>
                                         </template>
                                     </el-popconfirm>
-                                    <DeleteButton v-if="props.currentUserPrincipal===item.author.toString()"
+                                    <DeleteButton v-if="props.currentUserAddress===item.author.toString()"
                                                   :id="Number(item.id)"
                                                   :deleteFunction="deleteAnswer"
                                                   :loading="deleteLoading"/>
@@ -95,7 +95,7 @@
         </div>
     </div>
     <ReplyReply v-if="showReplyReply" v-model:visible="showReplyReply" :comments="comments" :replyId="commentId"
-                :postId="props.postId" :isOwner="props.isOwner" :currentUserPrincipal="props.currentUserPrincipal"
+                :postId="props.postId" :isOwner="props.isOwner" :currentUserAddress="props.currentUserAddress"
                 @refreshCallback="init()"/>
 </template>
 <script lang="ts" setup>
@@ -124,7 +124,7 @@
             type: Boolean,
             required: true,
         },
-        currentUserPrincipal: {
+        currentUserAddress: {
             type: String,
             required: true,
         }
