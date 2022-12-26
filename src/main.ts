@@ -7,10 +7,17 @@ import i18n from './locale';
 import router from './router';
 import App from './App.vue';
 import { ElInfiniteScroll } from "element-plus/es";
+import {
+    EthosConnectPlugin,
+    EthosConfiguration,
+} from "ethos-connect-vue";
 
+const config: EthosConfiguration = {
+    apiKey: "vue-example-app",
+};
 import { VueClipboard } from '@soerenmartius/vue3-clipboard'; //复制到粘贴板
 
 const app = createApp(App);
 const pinia = createPinia()
-app.use(i18n).use(router).use(VueClipboard).use(ElInfiniteScroll).use(pinia);
+app.use(i18n).use(router).use(VueClipboard).use(ElInfiniteScroll).use(pinia).use(EthosConnectPlugin, config);
 app.mount('#app');

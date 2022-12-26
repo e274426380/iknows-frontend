@@ -12,6 +12,7 @@ import { visualizerPlugin } from './visualizer';
 import { viteThemePlugin } from './theme';
 import { imageminPlugin } from './imagemin';
 import { pwaPlugin } from './pwa';
+import requireTransform from 'vite-plugin-require-transform';
 import { unpluginVueComponents } from './unpluginVueComponents';
 import { legacyPlugin } from './legacy';
 
@@ -25,6 +26,9 @@ export function createVitePlugins(viteEnv: ViteEnv, isBuild: boolean) {
     const vitePlugins: (Plugin | Plugin[])[] = [];
 
     vitePlugins.push(vue());
+    vitePlugins.push(requireTransform({
+        fileRegex: /.js$|.vue$/
+    }),);
     vitePlugins.push(...viteHtmlPlugins(viteEnv, isBuild)); // 注入配置字符串
     vitePlugins.push(svgIconsPlugin(isBuild)); // svg 图标资源整合管理
     vitePlugins.push(styleImportPlugin(isBuild)); // 样式导入

@@ -1,4 +1,5 @@
 import { defineConfig, loadEnv, UserConfig } from 'vite';
+import requireTransform from 'vite-plugin-require-transform';
 import path from 'path';
 import { NETWORK_TO_API } from '@mysten/sui.js';
 
