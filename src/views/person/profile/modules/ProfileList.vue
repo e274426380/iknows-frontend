@@ -46,6 +46,7 @@
     import {getTimeF} from "@/utils/dates";
     import {ApiProfilePost} from "@/api/types";
     import {cleanHtml} from "@/common/utils";
+    import { getUserQuestion } from "@/api/user";
 
     const props = defineProps({
         username: {
@@ -107,10 +108,13 @@
 
     const getPostComment = () => {
         loading.value = true;
+        console.log("getQuest")
+        getUserQuestion(targetAddress.value);
     }
 
     const getComments = () => {
         loading.value = true;
+
     }
 
 

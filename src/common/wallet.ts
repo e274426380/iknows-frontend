@@ -97,7 +97,7 @@ export function useWallet() {
         return userStore.address !== null;
     });
 
-    // remove saved wallet address. Can't revoke permissions yet.
+    // remove saved wallet address. Sui钱包目前还不能撤销权限
     const logout = async () => {
         if (authStore.walletProvider === walletProviders.ethosWallet.key && window[authStore.walletProvider]) {
             await window[authStore.walletProvider].disconnect();

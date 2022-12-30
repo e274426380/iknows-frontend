@@ -113,8 +113,8 @@
         detail: "",
         format: "html",
         category: "",
-        photos: ['123'],
-        author_name:userStore.user.name,
+        photos: [],
+        author_name: "",
     });
     const category = ref([{
         value: "Tech",
@@ -176,6 +176,7 @@
 
     onMounted(() => {
         init()
+        console.log("userStore.user.name",userStore.user.name)
     });
 
     const saveDraftBox = () => {
@@ -207,6 +208,9 @@
 
     const submit = async (formEl: FormInstance | undefined) => {
         console.log("submit formEl", formEl)
+        form.value.author_name = userStore.user.name;
+        console.log(" userStore.user.name", userStore.user.name)
+        console.log(" userStore.user.name", form.value.author_name)
         if (!formEl) return;
         await formEl.validate((valid, fields) => {
             if (valid && !isEditorErr.value) {
@@ -224,6 +228,8 @@
                         router.push('/post/detail/' + Number(res.Ok));
                         //发布成功后删除草稿箱里的内容。
                         localStorage.removeItem('postDraftBox')
+                    } else {
+
                     }
                 }).finally(() => {
                     loading.value = false;

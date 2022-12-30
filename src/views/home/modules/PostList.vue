@@ -39,22 +39,17 @@
                                     <div class="text">
                                         <div class="title">
                                             <span @click="onClick(Number(item.id))">{{item.title}}</span>
-                                            <span class="post-status enable"
-                                                  v-if="item.status.Enable!==undefined">{{t('common.status.enable')}}</span>
-                                            <span class="post-status completed"
-                                                  v-else-if="item.status.Completed!==undefined">{{t('common.status.completed')}}</span>
-                                            <span class="post-status closed" v-else-if="item.status.Closed!==undefined">{{t('common.status.closed')}}</span>
+                                            <!--<span class="post-status enable"-->
+                                                  <!--v-if="item.status.Enable!==undefined">{{t('common.status.enable')}}</span>-->
+                                            <!--<span class="post-status completed"-->
+                                                  <!--v-else-if="item.status.Completed!==undefined">{{t('common.status.completed')}}</span>-->
+                                            <!--<span class="post-status closed" v-else-if="item.status.Closed!==undefined">{{t('common.status.closed')}}</span>-->
                                         </div>
                                         <div class="info">
                                             <Username :addressId="item.author.toString()"
-                                                      :username="item.authorData && item.authorData.name!==''
-                                                      ? item.authorData.name: ''"/>
+                                                      :username="item.author_name"/>
                                             <span>|</span>
                                             <span class="createTime">{{getTimeF(Number(item.created_at))}}</span>
-                                        </div>
-                                        <div class="need-type" v-if="item.participants.length>0">
-                                            {{t('post.help.participants.label')}}
-                                            <el-tag v-for="(item,index) in item.participants">{{item}}</el-tag>
                                         </div>
                                     </div>
                                 </el-col>
@@ -63,15 +58,15 @@
                                 </el-col>
                             </el-row>
                             <div @click="onClick(Number(item.id))" class="content">
-                                {{item.content.content}}
+                                {{item.content.fields.content}}
                             </div>
                             <div class="footer">
-                                <div>
-                                    <LikeButton :postId="Number(item.id)" :likeCount="Number(item.likes_count)"/>
-                                </div>
-                                <div class="reply">
-                                    {{t('post.reply')+" "+item.comments.length}}
-                                </div>
+                                <!--<div>-->
+                                    <!--<LikeButton :postId="Number(item.id)" :likeCount="Number(item.likes_count)"/>-->
+                                <!--</div>-->
+                                <!--<div class="reply">-->
+                                    <!--{{t('post.reply')+" "+item.comments.length}}-->
+                                <!--</div>-->
                             </div>
                         </el-card>
                         <el-skeleton :loading="pageLoading" animated>
@@ -109,8 +104,7 @@
                                 {{ $t('common.loading') }}
                             </div>
                             <div class="note" v-else-if="totalCount === 0 || totalCount === list.length">
-                                <!--{{ $t('common.noMore') }}-->
-                                Waiting To Go Online
+                                {{ $t('common.noMore') }}
                             </div>
                         </el-row>
                     </el-col>
@@ -149,6 +143,7 @@
     import {getTimeF} from "@/utils/dates";
     import {ApiPost} from "@/api/types";
     import {cleanHtml} from "@/common/utils";
+    import { getPostPage } from "@/api/post";
 
     const router = useRouter();
 
@@ -190,16 +185,20 @@
 
     // 过滤显示的内容
     const showList = computed<Recordable<any>[]>(() => {
-        return list.value.map((item) => {
+        const slist = list.value.map((item) => {
             return {
                 ...item,
                 content: {
-                    //移除html标签
-                    content: item.content.content ? cleanHtml(item.content.content) : item.content.content,
-                    format: "html"
+                    fields:{
+                        //移除html标签
+                        content: item.content.fields.detail ? cleanHtml(item.content.fields.detail) : item.content.fields.detail,
+                        format: "html"
+                    }
                 }
             };
         });
+        console.log("slist",slist)
+        return slist;
     });
 
     const onScroll = () => {
@@ -225,11 +224,29 @@
 
     //isClean，是否在收集到返回值后，清空之前的list（用于切换板块）
     const init = (isClean: boolean) => {
-        pageLoading.value = false;
+        pageLoading.value = true;
         let category;
         //当board=''时，加载[]，而不是['']
         board.value ? category = [board.value] : category = [];
         console.log("post",pageNum.value, pageSize.value, search.value, category)
+        getPostPage(pageNum.value, pageSize.value, search.value, category).then(res=>{
+            console.log("getPostPage",res)
+            if(res.Ok){
+                //防止用户快速切换板块，导致bug。只有在category（运行方法时的板块值）等于board.value（现在的板块值）相等时才清空
+                if (board.value ? category.toString() == [board.value].toString() : category.length == 0) {
+                    //分页加载时不执行清空list操作
+                    if (isClean) {
+                        list.value = [];
+                    }
+                } else {
+                    return;
+                }
+                totalCount.value = res.Ok.length;
+                list.value.push(...res.Ok);
+            }
+        }).finally(() => {
+            pageLoading.value = false;
+        });
     }
 
     onMounted(() => {

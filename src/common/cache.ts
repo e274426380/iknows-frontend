@@ -177,9 +177,9 @@ const getExpiredData = (key: string, isLocal: boolean): any => {
 };
 
 // 清除指定缓存，有些数据需要更新，有缓存情况下，影响显示
-export const clearCacheData = (key: string): void => {
+export const removeCacheData = (key: string): void => {
     key = 'CACHE_' + key;
-    console.error('clear cache data for key: ' + key);
+    console.error('remove cache data for key: ' + key);
     delete CACHE_DATA[key];
     localStorage.removeItem(key);
 };

@@ -13,6 +13,7 @@ export function showUsername(username: string, addressId: string): string {
 
 // 移除html标签，只保留文本内容
 export function cleanHtml(html: string): string {
+    console.log("clean",html)
     // 正则里<表示尖括号；
     // 第一个\/?表示类似这种标签的情况；
     // .+?表示将中间的内容替代；

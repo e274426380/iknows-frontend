@@ -119,7 +119,7 @@
             </div>
         </nav>
         <el-backtop/>
-        <RegisterModal v-model:dialogVisible=registerDialogVisible />
+        <RegisterModal v-if="registerDialogVisible" v-model:dialogVisible=registerDialogVisible  @registerSuccess="getUserInfoFromServices"/>
     </div>
 </template>
 <script lang="ts" setup>
@@ -222,9 +222,7 @@
     //获取用户信息，并且设置
     const getUserInfoFromServices = async () => {
         console.log("getUserInfoFromServices address.value",address.value)
-        if (!address.value) {
-            await getAddress();
-        }
+        await getAddress();
         await getUser(address.value).then(res => {
             if (res.Ok) {
                 const user = res.Ok;
@@ -258,7 +256,7 @@
     };
 
     const onLogin = async () => {
-        console.log("verifyWalletPermissions",await verifyWalletPermissions())
+        console.log("onLogin verifyWalletPermissions",await verifyWalletPermissions())
         //验证是否连接过钱包，有就不用登录
         if (await verifyWalletPermissions()) {
             getUserInfoFromServices()

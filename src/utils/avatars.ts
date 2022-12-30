@@ -33,7 +33,9 @@ export function showUsername(username: string, addressId: string) {
 }
 // 处理用户名字显示的逻辑
 export function getUserRegName(addressId: string) {
-    //返回addressId作为名字，保留前10位
-    return addressId.substring(0, 10)
+    if (addressId !== null) {
+        //返回addressId作为名字，保留前10位
+        return addressId.substring(0, 10)
+    }
 }
 

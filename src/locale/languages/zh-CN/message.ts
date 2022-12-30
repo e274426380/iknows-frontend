@@ -1,10 +1,13 @@
 export default {
-    welcome: "欢迎登录",
+    welcome: "欢迎来到IKnows",
     error: {
         canister: "服务器出现了问题。",
         login: "登录失败",
         noLogin: "没有登录，请先登录才能发贴",
         noTarget: "找不到目标",
+        wallet: {
+            gas: "钱包没有足够的Gas。"
+        },
         network: {
             timeout: "网络连接超时"
         },

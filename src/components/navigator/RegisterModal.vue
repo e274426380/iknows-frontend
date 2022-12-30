@@ -38,13 +38,14 @@
     import { registerUser } from "@/api/user";
     import { useUserStore } from "@/stores/user";
     import { getUserRegName } from "@/utils/avatars";
+    import { showMessageSuccess } from "@/utils/message";
 
     const userStore = useUserStore();
-    const emit = defineEmits(['update:dialogVisible']);
+    const emit = defineEmits(['update:dialogVisible','registerSuccess']);
     const loading = ref(false)
     // const username = ref(userStore.address)
     const form = ref({
-        username: "User"+getUserRegName(userStore.address)
+        username: "User" + getUserRegName(userStore.address)
     });
     const ruleFormRef = ref<FormInstance>();
     const props = defineProps({
@@ -58,15 +59,21 @@
         if (!formEl) return;
         await formEl.validate((valid, fields) => {
             if (valid) {
-                registerUser(form.value.username).then(res=>{
-                    if(res.effects.status.status==="success"){
+                loading.value = true;
+                registerUser(form.value.username).then(res => {
+                    console.log("regisiter",res)
+                    if (res.effects.status.status === "success") {
                         //登录成功，刷新导航条
                         onClose();
+                        showMessageSuccess(t('message.welcome'))
+                        emit('registerSuccess')
                     } else {
                         //报错，可能是重复注册的原因
                     }
+                }).finally(() => {
+                    loading.value = false;
                 });
-            }else {
+            } else {
                 console.error('error submit!', fields)
             }
         })

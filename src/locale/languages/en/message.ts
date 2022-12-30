@@ -1,10 +1,13 @@
 export default {
-    welcome: "Welcome login",
+    welcome: "Welcome to IKnows",
     error: {
         canister: "Canister have some problem.",
         login: "Login Failed",
         noLogin: "No login, please login first",
         noTarget: "Can't Find Target",
+        wallet: {
+            gas: "Cannot find gas coin with amount sufficient for the budget."
+        },
         network: {
             timeout: "Network Connection Timeout"
         },

@@ -51,8 +51,11 @@ export type ApiDaoState = {
 };
 
 export type RichText = {
-    content: string; // 实际内容
-    format: 'text' | 'markdown' | 'html'; // 标记内容类型 有 3 种: text | html | markdown
+    fields: {
+        detail: string; // 实际内容
+        format: 'text' | 'markdown' | 'html'; // 标记内容类型 有 3 种: text | html | markdown
+    }
+    type: string;
 };
 
 export type PostCategory = {
@@ -80,22 +83,22 @@ export type ApiUserInfo = {
 
 export type ApiPost = {
     id: bigint; //id
-    author: string; // 作者
-    authorData?: ApiUserInfo; //作者详细资料 通过id获取对应资料
+    author: string; // 作者钱包地址
+    author_name: string; //作者名字
     title: string;
     comments?: ApiPostComments[];
     content: RichText;
     category: PostCategory;
     photos: number[];
     answer: number[];
-    participants: string[];//期待参与的人
-    end_time: [number]; //结束时间  opt格式，类似于[1000]，数组中只有一个数据。
+    // participants: string[];//期待参与的人
+    // end_time: [number]; //结束时间  opt格式，类似于[1000]，数组中只有一个数据。
     events?: ApiPostTimeline[];
-    likes_count: number; //点赞数
-    ask_for_money: any;
-    status: ApiPostStatus;
+    // likes_count: number; //点赞数
+    // ask_for_money: any;
+    // status: ApiPostStatus;
     created_at: number;
-    updated_at: number;
+    // updated_at: number;
 };
 
 export type ApiPostTimeline = {
