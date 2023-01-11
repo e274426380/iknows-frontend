@@ -10,15 +10,24 @@
                        :disabled="isDisabled">
                 {{t('dao.create')}}
             </el-button>
-            <div class="beta">
+            <div class="alpha">
                 <b class="flex-y-center">
                     <el-icon>
                         <Opportunity/>
                     </el-icon>
-                    Beta Warning!
+                    Alpha Warning!
                 </b>
-                <span class="text">iKnows is in the Beta phase, there may be issues.</span>
+                <span class="text">iKnows and Sui is in the Dev phase, data may be cleared at any time.</span>
             </div>
+            <!--<div class="beta">-->
+                <!--<b class="flex-y-center">-->
+                    <!--<el-icon>-->
+                        <!--<Opportunity/>-->
+                    <!--</el-icon>-->
+                    <!--Beta Warning!-->
+                <!--</b>-->
+                <!--<span class="text">iKnows is in the Beta phase, there may be issues.</span>-->
+            <!--</div>-->
             <el-divider/>
             <div class="public-item">
                 <a href="https://docs.sui.io/">
@@ -74,12 +83,21 @@
 
 <style lang="scss">
     .right-menu-container {
+        .alpha {
+            margin-top: 24px;
+            padding: 8px 16px;
+            color: #F56C6C;
+            background-color: rgba(245,108,108,.1);
+            border-radius: 10px;
+            .text {
+                font-size: 14px;
+            }
+        }
         .beta {
             margin-top: 24px;
             padding: 8px 16px;
             color: #e6a23c;
             background-color: #faecd8;
-            border-color: #faecd8;
             border-radius: 10px;
             .text {
                 font-size: 14px;

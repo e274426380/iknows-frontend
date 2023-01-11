@@ -62,7 +62,7 @@
                 loading.value = true;
                 registerUser(form.value.username).then(res => {
                     console.log("regisiter",res)
-                    if (res.effects.status.status === "success") {
+                    if (res.Ok) {
                         //登录成功，刷新导航条
                         onClose();
                         showMessageSuccess(t('message.welcome'))

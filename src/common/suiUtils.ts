@@ -2,6 +2,7 @@ import { JsonRpcProvider } from "@mysten/sui.js";
 import { contractAddress, suiRpcUrl } from "@/types/constants";
 import { showMessageError } from "@/utils/message";
 import { t } from "@/locale";
+import { forEach } from "lodash-es";
 
 const provider = new JsonRpcProvider(suiRpcUrl);
 
@@ -24,9 +25,9 @@ export async function executeMoveCall(moduleName: string, functionName: string, 
             showMessageError(t('message.error.wallet.gas'))
         } else {
             //没有错误就返回这个。
-            resolve(res);
+            resolve({Ok:res});
         }
-        reject(res)
+        reject({Err:res})
     });
 }
 
@@ -51,16 +52,26 @@ export async function getObjectsOwned(objectId: string): Promise<any> {
 // 获取目标Object的子object详细信息列表
 export async function getObjectsChild(objectId: string): Promise<any> {
     const res = await getObjectsOwned(objectId);
+    // console.log("res",res)
     //筛选子对象的objectId
     const keys = res.map(item => item.objectId)
-    //返回所有子对象详细信息。
-    const res1 = await getObjects(keys);
+    // console.log("keys",keys)
+    let childKeys = [] as Array<any>;
+    //获得所有子对象详细信息。可以用promise优化
+    for (const key of keys) {
+        const res1 = await getObjectsOwned(key);
+        if(res1){
+            childKeys.push(res1[0].objectId)
+        }
+    }
+    // const res1 = await getObjects(keys);
     // console.log("res1",res1)
-    //可能这里后面要单独分出来。
-    const childKeys = res1.map(item => item.details.data.fields.name.fields.name)
+    // // 获取目标的key，根据此key的objectId再次查找才能获取贴子内容。可能这里后面要单独分出来。
+    // const childKeys = data.map(item => item.details.data.fields.name.fields.name)
     // console.log("keys1",childKeys)
     const values = await getObjects(childKeys);
-    return {Ok: values.map(item => item.details.data.fields)}
+    // console.log("values",values)
+    return values.map(item => item.details.data.fields)
 }
 
 // 获取事件

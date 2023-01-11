@@ -28,7 +28,7 @@
                             </el-button>
                         </div>
                         <el-card class="post-card" v-for="(item,inex) in showList"
-                                 @click="onClick(Number(item.id))">
+                                 @click="onClick(item.id.id)">
                             <el-row justify="space-between">
                                 <el-col :span="20" class="card-info">
                                     <Avatar :username="item.authorData && item.authorData.name!=='' ?
@@ -38,7 +38,7 @@
                                             :size="60"/>
                                     <div class="text">
                                         <div class="title">
-                                            <span @click="onClick(Number(item.id))">{{item.title}}</span>
+                                            <span>{{item.title}}</span>
                                             <!--<span class="post-status enable"-->
                                                   <!--v-if="item.status.Enable!==undefined">{{t('common.status.enable')}}</span>-->
                                             <!--<span class="post-status completed"-->
@@ -49,7 +49,7 @@
                                             <Username :addressId="item.author.toString()"
                                                       :username="item.author_name"/>
                                             <span>|</span>
-                                            <span class="createTime">{{getTimeF(Number(item.created_at))}}</span>
+                                            <!--<span class="createTime">{{getTimeF(Number(item.created_at))}}</span>-->
                                         </div>
                                     </div>
                                 </el-col>
@@ -57,7 +57,7 @@
                                     <CategoryButton :category="item.category"/>
                                 </el-col>
                             </el-row>
-                            <div @click="onClick(Number(item.id))" class="content">
+                            <div class="content">
                                 {{item.content.fields.content}}
                             </div>
                             <div class="footer">
@@ -179,7 +179,8 @@
     //如果宽度小于426px则说明是移动端
     const isPhone = ref(document.documentElement.clientWidth < 426);
 
-    const onClick = (id: number) => {
+    const onClick = (id: string) => {
+        console.log("onCLICK",id)
         router.push('/post/detail/' + id);
     }
 

@@ -21,33 +21,31 @@
                             </div>
                             <div class="author">
                                 <div class="flex">
-                                    <Avatar :username="item.authorData && item.authorData.name!=='' ?
-                                            item.authorData.name : item.author.toString()"
+                                    <Avatar :username="item.author_name"
                                             :addressId=item.author.toString()
                                             :size="38"/>
                                     <div class="authorName">
                                         <b>
                                             <Username :addressId="item.author.toString()"
-                                                      :username="item.authorData && item.authorData.name!==''
-                                                      ? item.authorData.name: ''"/>
+                                                      :username="item.author_name"/>
                                         </b>
                                         <div class="sign" v-if="item.authorData && item.authorData.biography!==''">
                                             {{item.authorData.biography}}
                                         </div>
                                     </div>
                                 </div>
-                                <span class="create-time">{{getTimeF(Number(item.created_at))}}</span>
+                                <!--<span class="create-time">{{getTimeF(Number(item.created_at))}}</span>-->
                             </div>
                             <div class="content ql-snow">
                                 <div v-if="item.content.format==='html'"
                                      class="ql-editor"
                                      :class="{hidden:!foldIndex[index]}"
                                      ref="htmlInformation"
-                                     v-html="item.content.content"
+                                     v-html="item.content.detail"
                                 >
                                 </div>
                                 <div v-else>
-                                    {{item.content.content}}
+                                    {{item.content.detail}}
                                 </div>
                             </div>
                             <div class="footer">
@@ -59,26 +57,26 @@
                                     <span v-else @click="openReplyReply(index)">
                                         {{item.comments.length+ " " + t('post.item') + t('post.comments')}}
                                     </span>
-                                    <span @click="share(item.id)">{{t('common.share')}}</span>
-                                    <el-popconfirm v-if="isOwner && props.answerId===undefined"
-                                                   :title="t('post.adopt.confirm')"
-                                                   :confirmButtonText="t('common.confirm')"
-                                                   :cancelButtonText="t('common.cancel')"
-                                                   @confirm="submitAnswer(Number(item.post_id),Number(item.id))"
-                                    >
-                                        <template #reference>
-                                            <div class="owner-div flex-y-center">
-                                                <el-icon>
-                                                    <Medal/>
-                                                </el-icon>
-                                                <span>{{t('post.adopt.text')}}</span>
-                                            </div>
-                                        </template>
-                                    </el-popconfirm>
-                                    <DeleteButton v-if="props.currentUserAddress===item.author.toString()"
-                                                  :id="Number(item.id)"
-                                                  :deleteFunction="deleteAnswer"
-                                                  :loading="deleteLoading"/>
+                                    <span @click="share()">{{t('common.share')}}</span>
+                                    <!--<el-popconfirm v-if="isOwner && props.answerId===undefined"-->
+                                    <!--:title="t('post.adopt.confirm')"-->
+                                    <!--:confirmButtonText="t('common.confirm')"-->
+                                    <!--:cancelButtonText="t('common.cancel')"-->
+                                    <!--@confirm="submitAnswer(Number(item.post_id),Number(item.id))"-->
+                                    <!--&gt;-->
+                                    <!--<template #reference>-->
+                                    <!--<div class="owner-div flex-y-center">-->
+                                    <!--<el-icon>-->
+                                    <!--<Medal/>-->
+                                    <!--</el-icon>-->
+                                    <!--<span>{{t('post.adopt.text')}}</span>-->
+                                    <!--</div>-->
+                                    <!--</template>-->
+                                    <!--</el-popconfirm>-->
+                                    <!--<DeleteButton v-if="props.currentUserAddress===item.author.toString()"-->
+                                    <!--:id="Number(item.id)"-->
+                                    <!--:deleteFunction="deleteAnswer"-->
+                                    <!--:loading="deleteLoading"/>-->
                                 </div>
                                 <div>
                                     <span v-if="!foldIndex[index]" @click="fold(index)">{{t('common.expand')}}</span>
@@ -99,22 +97,23 @@
                 @refreshCallback="init()"/>
 </template>
 <script lang="ts" setup>
-    import {ref, onMounted, defineProps, defineExpose} from 'vue';
-    import {ElRow, ElCol, ElButton, ElCard, ElIcon, ElPopconfirm, ElTag} from 'element-plus/es';
-    import {Medal, Flag} from '@element-plus/icons-vue';
+    import { ref, onMounted, defineProps, defineExpose } from 'vue';
+    import { ElRow, ElCol, ElButton, ElCard, ElIcon, ElPopconfirm, ElTag } from 'element-plus/es';
+    import { Medal, Flag } from '@element-plus/icons-vue';
     import Avatar from '@/components/common/Avatar.vue';
     import Username from '@/components/common/Username.vue';
     import DeleteButton from '@/components/common/PostDeleteButton.vue';
     import ReplyReply from './ReplyReply.vue';
-    import {ApiPostComments} from "@/api/types";
-    import {t} from '@/locale';
-    import {toClipboard} from "@soerenmartius/vue3-clipboard";
-    import {showMessageSuccess, showResultError} from "@/utils/message";
-    import {getTimeF} from "@/utils/dates";
+    import { ApiPostComments } from "@/api/types";
+    import { t } from '@/locale';
+    import { toClipboard } from "@soerenmartius/vue3-clipboard";
+    import { showMessageSuccess, showResultError } from "@/utils/message";
+    import { getTimeF } from "@/utils/dates";
+    import { getPostCommentReply, getPostComments } from "@/api/post";
 
     const props = defineProps({
         postId: {
-            type: Number,
+            type: String,
             required: true,
         },
         answerId: {
@@ -140,7 +139,7 @@
     const pageNum = ref(0);
     const total = ref(0);
     const replyIndex = ref(-1);
-    const commentId = ref(0);
+    const commentId = ref("");
     const comments = ref<any[]>([]);
 
     const onScroll = () => {
@@ -162,10 +161,10 @@
         replyIndex.value = index;
         comments.value = list.value[index].comments;
         showReplyReply.value = true;
-        commentId.value = Number(list.value[index].id);
+        commentId.value = list.value[index].id.id;
     }
 
-    const share = async (id: bigint) => {
+    const share = async () => {
         try {
             await toClipboard(window.location.href)
             showMessageSuccess(t('message.share.success'))
@@ -200,6 +199,35 @@
     }
 
     const init = async () => {
+        await getPostComments(props.postId).then(async res => {
+            console.log("getPostComments", res)
+            if (res.Ok) {
+                list.value = res.Ok
+                const replys = await getPostCommentReply();
+                console.log("resply", replys)
+                //从列表里筛选出匹配的comments
+                list.value.forEach(item => {
+                    //TODO 这里移除了sui自带的fields
+                    const comments = replys.Ok.filter(reply => reply.comment_id === item.id.id)
+                        .map(item => {
+                            item.content = item.content.fields;
+                            return item
+                        })
+                    Object.assign(item, {
+                        //TODO 这里移除了sui自带的fields
+                        content: item.content.fields,
+                        comments: comments
+                    })
+                })
+                console.log("list",list.value)
+                total.value = list.value.length;
+                //如果有采纳的答案就展示
+                // if (props.answerId) {
+                //     console.log("props.answerId", props.answerId)
+                //     onTop(props.answerId);
+                // }
+            }
+        });
         if (list.value.length > 0 && replyIndex.value !== -1 && showReplyReply.value) {
             //如果replyIndex不为0，说明用户目前在看评论区，需要重新加载一下评论区的数据
             openReplyReply(replyIndex.value);
@@ -246,7 +274,7 @@
                 .owner-div {
                     margin-left: 10px;
                 }
-                .delete-button{
+                .delete-button {
                     margin-left: 10px;
                 }
                 .footer {

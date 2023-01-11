@@ -13,7 +13,7 @@
                         <div class="title">{{item.title}}</div>
                         <div class="content">
                             <span v-if="props.username!=='' && option==='reply'">{{props.username+" ："}}</span>
-                            {{item.content.content}}
+                            {{item.content.detail}}
                         </div>
                         <el-row justify="space-between" class="footer">
                             <div>

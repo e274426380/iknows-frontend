@@ -12,8 +12,7 @@
                 <div class="replyReply" v-for="(item,index) in showList">
                     <div class="head">
                         <div class="author">
-                            <Avatar :username="item.authorData && item.authorData.name!=='' ?
-                                item.authorData.name : item.author.toString()"
+                            <Avatar :username="item.author_name"
                                     :addressId=item.author.toString()
                                     :clickable="false"
                                     :size="24"/>
@@ -21,23 +20,21 @@
                                 <div>
                                     <b>
                                         <Username :addressId="item.author.toString()"
-                                                  :username="item.authorData && item.authorData.name!==''
-                                                      ? item.authorData.name: ''"/>
+                                                  :username="item.author_name"/>
                                     </b>
-                                    <span class="quote-name" v-if="item.quote_id.length >0">{{t('post.reply')+" "+item.quoteName}}</span>
                                 </div>
                             </div>
                         </div>
-                        <span>{{getTimeF(Number(item.created_at))}}</span>
+                        <!--<span>{{getTimeF(Number(item.created_at))}}</span>-->
                     </div>
                     <div class="content">
-                        {{item.content.content}}
-                        <span class="reply-button" v-if="item.isReply" @click="replyOther(item)">{{t('post.cancelReply')}}</span>
-                        <span class="reply-button" v-else @click="replyOther(item)">{{t('post.reply')}}</span>
-                        <DeleteButton v-if="props.currentUserAddress===item.author.toString()"
-                                      :id="Number(item.id)"
-                                      :deleteFunction="deleteComment"
-                                      :loading="deleteLoading"/>
+                        {{item.content.detail}}
+                        <!--<span class="reply-button" v-if="item.isReply" @click="replyOther(item)">{{t('post.cancelReply')}}</span>-->
+                        <!--<span class="reply-button" v-else @click="replyOther(item)">{{t('post.reply')}}</span>-->
+                        <!--<DeleteButton v-if="props.currentUserAddress===item.author.toString()"-->
+                                      <!--:id="Number(item.id)"-->
+                                      <!--:deleteFunction="deleteComment"-->
+                                      <!--:loading="deleteLoading"/>-->
                     </div>
                 </div>
                 <div class="dialog-pagination">
@@ -68,6 +65,7 @@
     import {getTimeF} from "@/utils/dates";
     import {showMessageError, showMessageSuccess, showResultError} from "@/utils/message";
     import {t} from "@/locale";
+    import { addTopicCommentReply } from "@/api/post";
 
     const props = defineProps({
         visible: {
@@ -80,11 +78,11 @@
             required: true
         },
         replyId: {
-            type: Number,
+            type: String,
             required: true
         },
         postId: {
-            type: Number,
+            type: String,
             required: true,
         },
         isOwner: {
@@ -131,21 +129,6 @@
 
     const paging = () => {
         showList.value = itemList.value.slice(pageSize.value * (pageNum.value - 1), pageSize.value * pageNum.value);
-        for (let i = 0; i < showList.value.length; i++) {
-            const quoteId = Number(showList.value[i].quote_id[0]);
-            let quoteIndex: number = -1;
-            //查询是否有引用的评论，先把addressId加进去。
-            if (quoteId && quoteId !== 0) {
-                showList.value.map((item, index) => {
-                    if (Number(item.id) === quoteId) {
-                        quoteIndex = index;
-                    }
-                })
-                if (quoteIndex !== -1) {
-                    showList.value[i].quoteName = showList.value[quoteIndex].author.toString();
-                }
-            }
-        }
     }
 
     const replyOther = (item: any) => {
@@ -171,6 +154,16 @@
             return
         }
         loading.value = true;
+        addTopicCommentReply(props.postId, props.replyId, replyReply.value).then(res => {
+            console.log("addPostReplyReply", res)
+            if (res.Ok) {
+                showMessageSuccess(t('message.post.reply'));
+                replyReply.value = "";
+                emit('refreshCallback');
+            }
+        }).finally(() => {
+            loading.value = false;
+        })
     }
 
     const onClose = () => {

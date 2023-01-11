@@ -75,7 +75,7 @@
 </template>
 
 <script lang="ts" setup>
-    import { ref, onMounted, watch, computed, nextTick } from 'vue';
+    import { ref, toRaw, onMounted, watch, computed, nextTick } from 'vue';
     import Navigator from '@/components/navigator/Navigator.vue';
     import {
         ElRow, ElCol, ElButton, ElSelect, ElOption, ElForm, ElFormItem, ElInput, ElMessage, ElConfigProvider,
@@ -92,6 +92,7 @@
     import { calculatedICPIdLength, uploadImage } from "@/utils/images";
     import { useUserStore } from "@/stores/user";
     import { submitPost } from "@/api/post";
+    import { contractAddress, topicBoardAddress } from "@/types/constants";
 
     const userStore = useUserStore();
     const router = useRouter();
@@ -209,8 +210,7 @@
     const submit = async (formEl: FormInstance | undefined) => {
         console.log("submit formEl", formEl)
         form.value.author_name = userStore.user.name;
-        console.log(" userStore.user.name", userStore.user.name)
-        console.log(" userStore.user.name", form.value.author_name)
+        console.log("form", form.value);
         if (!formEl) return;
         await formEl.validate((valid, fields) => {
             if (valid && !isEditorErr.value) {
@@ -220,16 +220,21 @@
                 });
                 loading.value = true;
                 console.log("form", form.value);
-                //submit
-                submitPost(form.value).then(res => {
+                console.log("photos", form.value.photos);
+                //submit 解除vue的响应式，免得将数组字段改成proxy
+                // submitPost(JSON.parse(JSON.stringify(form.value))).then(res => {
+                submitPost(toRaw(form.value)).then(res => {
                     console.log(res);
                     if (res.Ok) {
                         showMessageSuccess(t('message.post.create'));
-                        router.push('/post/detail/' + Number(res.Ok));
+                        //通过查找create里是否存在owner为topic合约地址的对象来获得新发贴的地址id
+                        //@ts-ignore
+                        const postId = res.Ok.effects.events
+                            .find(item => item.newObject && item.newObject.objectType === contractAddress+"::topic::Topic")
+                            .newObject.objectId
+                        router.push('/post/detail/' + postId);
                         //发布成功后删除草稿箱里的内容。
                         localStorage.removeItem('postDraftBox')
-                    } else {
-
                     }
                 }).finally(() => {
                     loading.value = false;

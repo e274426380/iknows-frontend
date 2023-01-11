@@ -6,7 +6,7 @@
                     <div class="post-title">
                         <el-row justify="space-between">
                             <el-col :span="20" class="card-info">
-                                <Avatar :username="author && author.name ? author?.name : ''"
+                                <Avatar :username="post.author_name"
                                         :address-id=post.author.toString()
                                         :avatar-id="Number(author?.avatar_id)"
                                         :clickable="false"
@@ -14,10 +14,10 @@
                                 <div class="text">
                                     <div class="title">
                                         <span>{{post.title}}</span>
-                                        <span class="post-status enable" v-if="post.status.Enable!==undefined">{{t('common.status.enable')}}</span>
-                                        <span class="post-status completed"
-                                              v-else-if="post.status.Completed!==undefined">{{t('common.status.completed')}}</span>
-                                        <span class="post-status closed" v-else-if="post.status.Closed!==undefined">{{t('common.status.closed')}}</span>
+                                        <!--<span class="post-status enable" v-if="post.status.Enable!==undefined">{{t('common.status.enable')}}</span>-->
+                                        <!--<span class="post-status completed"-->
+                                              <!--v-else-if="post.status.Completed!==undefined">{{t('common.status.completed')}}</span>-->
+                                        <!--<span class="post-status closed" v-else-if="post.status.Closed!==undefined">{{t('common.status.closed')}}</span>-->
                                     </div>
                                     <div class="info">
                                         <Username :addressId="post.author.toString()"
@@ -25,11 +25,7 @@
                                                       ? author.name: ''"
                                                 :clickable="true"/>
                                         <span>|</span>
-                                        <span class="createTime">{{getTimeF(Number(post.created_at))}}</span>
-                                    </div>
-                                    <div class="need-type" v-if="post.participants.length>0">
-                                        {{t('post.help.participants.label')}}
-                                        <el-tag v-for="(item,index) in post.participants">{{item}}</el-tag>
+                                        <!--<span class="createTime">{{getTimeF(Number(post.created_at))}}</span>-->
                                     </div>
                                 </div>
                             </el-col>
@@ -42,19 +38,20 @@
                                  class="ql-editor"
                                  :class="{hidden:isFold}"
                                  ref="htmlInformation"
-                                 v-html="post.content.content"
+                                 v-html="post.content.detail"
                             >
                             </div>
                             <div v-else>
-                                {{post.content.content}}
+                                {{post.content.detail}}
                             </div>
                         </div>
-                        <div class="adopted" v-if="post.answer.length>0">
-                            <el-icon>
-                                <Flag/>
-                            </el-icon>
-                            {{t('post.adopt.already')}}
-                        </div>
+                        <!--采纳-->
+                        <!--<div class="adopted" v-if="post.answer.length>0">-->
+                            <!--<el-icon>-->
+                                <!--<Flag/>-->
+                            <!--</el-icon>-->
+                            <!--{{t('post.adopt.already')}}-->
+                        <!--</div>-->
                         <div class="footer">
                             <div>
                                 <el-button type="primary" style="margin-right: 5px" @click="writeAnswer">
@@ -65,9 +62,9 @@
                                 <span v-if="isFold" @click="isFold = !isFold" class="fold">{{t('common.expand')}}</span>
                                 <span v-else @click="isFold = !isFold" class="fold">{{t('common.fold')}}</span>
                             </div>
-                            <div v-if="isOwner">
-                                <DeleteButton :deleteFunction="deleteThisPost" :loading="loading"/>
-                            </div>
+                            <!--<div v-if="isOwner">-->
+                                <!--<DeleteButton :deleteFunction="deleteThisPost" :loading="loading"/>-->
+                            <!--</div>-->
                         </div>
                     </div>
                 </el-col>

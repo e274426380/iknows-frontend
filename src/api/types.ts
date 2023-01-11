@@ -21,6 +21,12 @@ export type ApiError = {
 // 后端的返回结果
 export type ApiResult<T> = {
     Ok?: T;
+    effects?: {
+        status: {
+            status: 'success' | 'error'
+        },
+        created:any
+    }
     Err?: ApiError;
 };
 // 后端的返回结果 分页
@@ -51,6 +57,8 @@ export type ApiDaoState = {
 };
 
 export type RichText = {
+    detail: string; // 实际内容
+    format: 'text' | 'markdown' | 'html'; // 标记内容类型 有 3 种: text | html | markdown
     fields: {
         detail: string; // 实际内容
         format: 'text' | 'markdown' | 'html'; // 标记内容类型 有 3 种: text | html | markdown
@@ -113,6 +121,7 @@ export type ApiPostTimeline = {
 
 export type ApiPostComments = {
     author: string; // 作者addressID
+    author_name: string; //作者用户名
     authorData?: ApiUserInfo; //作者详细资料 通过id获取对应资料
     comment_id: number[];
     comments: [];
@@ -120,7 +129,9 @@ export type ApiPostComments = {
     quoteName?: string;
     content: RichText;
     created_at: bigint;
-    id: bigint;
+    id: {
+        id:string
+    };
     post_id: bigint;
     isReply?: boolean; //是否被回复
 }

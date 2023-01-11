@@ -130,7 +130,7 @@
                 content: {
                     //移除html标签
                     content: item.payload.execute_args.AddGovernanceMember.content
-                        ? cleanHtml(item.payload.execute_args.AddGovernanceMember.content.content)
+                        ? cleanHtml(item.payload.execute_args.AddGovernanceMember.content.detail)
                         : item.payload.execute_args.AddGovernanceMember.content,
                     format: "html"
                 }

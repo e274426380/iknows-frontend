@@ -42,6 +42,7 @@
     import {calculatedICPIdLength, uploadImage} from "@/utils/images";
     import {useRoute} from "vue-router";
     import {showMessageSuccess} from "@/utils/message";
+    import { addTopicComment } from "@/api/post";
 
     const editorOption = {
         modules: {
@@ -64,20 +65,21 @@
                     // ["link", "image","video"], // 链接、图片、视频
                 ], //工具菜单栏配置
             },
-            imageUploader: {
-                upload: (file) => {
-                    return new Promise((resolve, reject) => {
-                        uploadImage(file).then(res => {
-                                if (res!=='') {
-                                    resolve(res)
-                                } else {
-                                    reject()
-                                }
-                            }
-                        )
-                    });
-                }
-            },
+            // 先关闭图片上传的功能。
+            // imageUploader: {
+            //     upload: (file) => {
+            //         return new Promise((resolve, reject) => {
+            //             uploadImage(file).then(res => {
+            //                     if (res!=='') {
+            //                         resolve(res)
+            //                     } else {
+            //                         reject()
+            //                     }
+            //                 }
+            //             )
+            //         });
+            //     }
+            // },
         },
         placeholder: '......',       //placeholder,在双语切换时不会即时响应
         readyOnly: false, //是否只读
@@ -86,7 +88,7 @@
     };
     const loading = ref(false);
     const route = useRoute();
-    const postId = Number(route.params.id);
+    const postId = route.params.id.toString();
     //编辑器是否发生变化
     const isEditorChange = ref(false);
     const isEditorErr = ref(false);
@@ -105,13 +107,13 @@
     const showEditorLength = computed(() => {
         // 这个返回的字数是专门把图片上传到后端，用特殊字符串取代，放以后再看看
         // 放在第一位，免得computed不知道计算那个属性改变
-        const length = calculatedICPIdLength(reply.value);
-        // 没有完成初始化时，直接使用myTextEditor里的方法会报错。
-        // 如果内容为空，就返回0
-        if(myTextEditor.value && myTextEditor.value.getText().trim().length===0){
-            return 0;
-        }
-        length > limitLength ? (isEditorErr.value = true) : (isEditorErr.value = false);
+        // const length = calculatedICPIdLength(reply.value);
+        // // 没有完成初始化时，直接使用myTextEditor里的方法会报错。
+        // // 如果内容为空，就返回0
+        // if(myTextEditor.value && myTextEditor.value.getText().trim().length===0){
+        //     return 0;
+        // }
+        // length > limitLength ? (isEditorErr.value = true) : (isEditorErr.value = false);
         return length;
     });
 
@@ -122,6 +124,16 @@
             return
         }
         loading.value = true;
+        addTopicComment(postId, reply.value).then(res => {
+            console.log(res);
+            if (res.Ok) {
+                emit('replySuccess');
+                showMessageSuccess(t('message.post.reply'));
+                emit('foldWrite');
+            }
+        }).finally(() => {
+            loading.value = false;
+        })
     }
 
 </script>

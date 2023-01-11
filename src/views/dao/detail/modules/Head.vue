@@ -32,11 +32,11 @@
                                  class="ql-editor"
                                  :class="{hidden:isFold}"
                                  ref="htmlInformation"
-                                 v-html="proposal.payload.execute_args.AddGovernanceMember.content.content"
+                                 v-html="proposal.payload.execute_args.AddGovernanceMember.content.detail"
                             >
                             </div>
                             <div v-else>
-                                {{proposal.payload.execute_args.AddGovernanceMember.content.content}}
+                                {{proposal.payload.execute_args.AddGovernanceMember.content.detail}}
                             </div>
                         </div>
                         <div class="footer">

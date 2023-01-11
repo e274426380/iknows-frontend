@@ -4,8 +4,8 @@
         <Head :post="post" :isOwner="isOwner" @showWrite="showWriteReply()" v-if="post!==undefined"/>
         <WriteReply @foldWrite="foldWrite(false)" @replySuccess="replyInit" v-show="showWrite"/>
         <div v-if="post!==undefined" style="min-height: 70vh">
-            <TimeLine :postId="postId" @changeStatusSuccess="init" :isOwner="isOwner"/>
-            <Reply :postId="postId" :answerId="post.answer.length>0 ? Number(post.answer[0]) : undefined" ref="reply"
+            <!--<TimeLine :postId="postId" @changeStatusSuccess="init" :isOwner="isOwner"/>-->
+            <Reply :postId="postId" ref="reply"
                    :isOwner="isOwner"
                    :currentUserAddress="currentUserAddress"/>
         </div>
@@ -19,14 +19,18 @@
     import WriteReply from './modules/WriteReply.vue';
     import Reply from './modules/Reply.vue';
     import {ElLoading} from 'element-plus/es';
-    import {useRoute} from 'vue-router';
+    import { useRoute, useRouter } from 'vue-router';
     import {ApiPost} from "@/api/types";
     import {t} from "@/locale";
     import { useUserStore } from "@/stores/user";
+    import { showMessageError } from "@/utils/message";
+    import { goBack } from "@/router/routers";
+    import { getPostInfo } from "@/api/post";
 
     const route = useRoute();
+    const router = useRouter();
     const userStore = useUserStore();
-    const postId = Number(route.params.id);
+    const postId = route.params.id.toString();
     const currentUserAddress = computed<string>(() => userStore.address);
     // 是否是本人 或者是管理员。关联编辑，删除按钮的显示与否
     // 本地环境下，authorId和currentId会有冲突。
@@ -54,22 +58,26 @@
             lock: true
         });
         loading.value = true;
-        // getPostInfo(postId).then(res => {
-        //     console.log("getPostInfo", res)
-        //     if (res.Ok) {
-        //         post.value = res.Ok
-        //         console.log("detail", isOwner.value)
-        //     } else if (res.Err && res.Err.PostNotFound !== undefined) {
-        //         showMessageError(t('message.error.noTarget'));
-        //         setTimeout(() => {
-        //             //等用户看清了错误提示再弹
-        //             goBack(router);
-        //         }, 1500);
-        //     }
-        // }).finally(() => {
-        //     fullLoading.close();
-        //     loading.value = false
-        // })
+        getPostInfo(postId).then(res => {
+            console.log("getPostInfo", res)
+            if (res.status === "Exists") {
+                //移除content字段里sui自动添加的fields外壳。
+                post.value = {
+                    ...res.details.data.fields,
+                    content: res.details.data.fields.content.fields
+                }
+                console.log("detail", post.value)
+            } else {
+                showMessageError(t('message.error.noTarget'));
+                setTimeout(() => {
+                    //等用户看清了错误提示再弹
+                    goBack(router);
+                }, 1500);
+            }
+        }).finally(() => {
+            fullLoading.close();
+            loading.value = false
+        })
     }
 
     const showWriteReply = () => {
