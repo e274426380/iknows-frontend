@@ -1,9 +1,9 @@
 <template>
     <el-button class="category-button" type="primary">
-        <span v-if="category.Tech!==undefined">{{t('post.help.category.tech')}}</span>
-        <span v-else-if="category.Law!==undefined">{{t('post.help.category.law')}}</span>
-        <span v-else-if="category.Safeguard!==undefined">{{t('post.help.category.safeguard')}}</span>
-        <span v-else-if="category.Blacklist!==undefined">{{t('post.help.category.blacklist')}}</span>
+        <span v-if="category==='Tech'">{{t('post.help.category.tech')}}</span>
+        <span v-else-if="category==='Law'">{{t('post.help.category.law')}}</span>
+        <span v-else-if="category==='Safeguard'">{{t('post.help.category.safeguard')}}</span>
+        <span v-else-if="category==='Blacklist'">{{t('post.help.category.blacklist')}}</span>
         <span v-else>{{t('post.help.category.other')}}</span>
     </el-button>
 </template>
@@ -17,7 +17,7 @@
     const props = defineProps({
         // 必要的内容，显示哪些
         category: {
-            type: Object,
+            type: String,
             required: true,
         },
         // 是否可以点击（hover时鼠标变手）

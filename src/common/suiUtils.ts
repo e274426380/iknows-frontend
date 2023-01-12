@@ -9,14 +9,20 @@ const provider = new JsonRpcProvider(suiRpcUrl);
 // 调用move合约
 export async function executeMoveCall(moduleName: string, functionName: string, args: any): Promise<any> {
     console.log("args", args)
-    const res = await window.suiWallet.executeMoveCall({
-        packageObjectId: contractAddress,
-        module: moduleName,
-        function: functionName,
-        typeArguments: [],
-        arguments: args, //将参数转换为合约能读懂的数组形式
-        gasBudget: 10000,
-    })
+    let res;
+    try {
+        res = await window.suiWallet.executeMoveCall({
+            packageObjectId: contractAddress,
+            module: moduleName,
+            function: functionName,
+            typeArguments: [],
+            arguments: args, //将参数转换为合约能读懂的数组形式
+            gasBudget: 10000,
+        })
+    } catch (e) {
+        console.error("executeMoveCall Error",res)
+        showMessageError('Sui Net may have a problem')
+    }
     console.log("executeMoveCall", res)
     return new Promise(function (resolve, reject) {
         const err = res.toString();

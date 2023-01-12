@@ -96,7 +96,7 @@ export type ApiPost = {
     title: string;
     comments?: ApiPostComments[];
     content: RichText;
-    category: PostCategory;
+    category: string;
     photos: number[];
     answer: number[];
     // participants: string[];//期待参与的人

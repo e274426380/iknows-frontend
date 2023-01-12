@@ -158,22 +158,24 @@
         return [{
             value: "",
             label: t('post.help.category.all')
-        }, {
-            value: "Tech",
-            label: t('post.help.category.tech')
-        }, {
-            value: "Law",
-            label: t('post.help.category.law')
-        }, {
-            value: "Safeguard",
-            label: t('post.help.category.safeguard')
-        }, {
-            value: "Blacklist",
-            label: t('post.help.category.blacklist')
-        }, {
-            value: "Other",
-            label: t('post.help.category.other')
-        }]
+        },
+        //     {
+        //     value: "Tech",
+        //     label: t('post.help.category.tech')
+        // }, {
+        //     value: "Law",
+        //     label: t('post.help.category.law')
+        // }, {
+        //     value: "Safeguard",
+        //     label: t('post.help.category.safeguard')
+        // }, {
+        //     value: "Blacklist",
+        //     label: t('post.help.category.blacklist')
+        // }, {
+        //     value: "Other",
+        //     label: t('post.help.category.other')
+        // }
+        ]
     });
     const list = ref<ApiPost[]>([]);
     //如果宽度小于426px则说明是移动端
