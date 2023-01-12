@@ -5,12 +5,15 @@
         <!--<a class="icon-link" target="blank" href="https://t.me/">-->
             <!--<i class="iconfont icon-telegram"></i>-->
         <!--</a>-->
+        <a class="icon-link" target="blank" href="https://github.com/iKnowsDAO">
+            <i class="iconfont icon-github"></i>
+        </a>
         <a class="icon-link" target="blank" href="https://twitter.com/iknows_Sui">
             <i class="iconfont icon-twitter"></i>
         </a>
-        <!--<a class="icon-link" target="blank" href="https://discord.gg/3ZUUaaWrSE">-->
-            <!--<i class="iconfont icon-discord"></i>-->
-        <!--</a>-->
+        <a class="icon-link" target="blank" href="https://discord.gg/3ZUUaaWrSE">
+            <i class="iconfont icon-discord"></i>
+        </a>
     </div>
 </template>
 <script lang="ts" setup></script>
