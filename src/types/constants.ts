@@ -1,6 +1,6 @@
-export const contractAddress = '0x84142b7d621f844f405a9a8a8641e645185d4d4a';
-export const userRegisterAddress = '0x760fff36b84f2788006d0c02569d492dcdd24f76'; //记录用户是否重复注册的合约地址
-export const topicBoardAddress = '0xcb3d20404f1119f76104debbb838af323641cc15'; //记录发贴数据
+export const contractAddress = '0x2a5142daa438366ae42cfb47dc35664efa153d35';
+export const userRegisterAddress = '0xdd08e5cfb5ce67b515172ed26ea87c4a96aeb3c0'; //记录用户是否重复注册的合约地址
+export const topicBoardAddress = '0x8ccf3e769465000de9549ea2713da16fab97bd6f'; //记录发贴数据
 export const suiRpcUrl = 'https://fullnode.devnet.sui.io:443'
 export const localStorageKeys = {
     address: 'user_sui_address',
