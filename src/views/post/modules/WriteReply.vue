@@ -4,7 +4,7 @@
             <el-row>
                 <el-col :sm={span:16,offset:4} :xs="24">
                     <el-card :class="{ isEditorError: isEditorErr }">
-                        <h4>{{t('post.answer')}}</h4>
+                        <h4 style="margin-bottom:5px;">{{t('post.answer')}}</h4>
                         <QuillEditor
                             ref="myTextEditor"
                             v-model:content="reply"
@@ -107,13 +107,13 @@
     const showEditorLength = computed(() => {
         // 这个返回的字数是专门把图片上传到后端，用特殊字符串取代，放以后再看看
         // 放在第一位，免得computed不知道计算那个属性改变
-        // const length = calculatedICPIdLength(reply.value);
-        // // 没有完成初始化时，直接使用myTextEditor里的方法会报错。
-        // // 如果内容为空，就返回0
-        // if(myTextEditor.value && myTextEditor.value.getText().trim().length===0){
-        //     return 0;
-        // }
-        // length > limitLength ? (isEditorErr.value = true) : (isEditorErr.value = false);
+        const length = reply.value.length;
+        // 没有完成初始化时，直接使用myTextEditor里的方法会报错。
+        // 如果内容为空，就返回0
+        if(myTextEditor.value && myTextEditor.value.getText().trim().length===0){
+            return 0;
+        }
+        length > limitLength ? (isEditorErr.value = true) : (isEditorErr.value = false);
         return length;
     });
 
@@ -130,6 +130,8 @@
                 emit('replySuccess');
                 showMessageSuccess(t('message.post.reply'));
                 emit('foldWrite');
+                //将内容清空
+                myTextEditor.value?.setHTML('');
             }
         }).finally(() => {
             loading.value = false;

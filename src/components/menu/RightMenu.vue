@@ -17,7 +17,8 @@
                     </el-icon>
                     Alpha Warning!
                 </b>
-                <span class="text">iKnows and Sui is in the Dev phase, data may be cleared at any time.</span>
+                <span class="text">iKnows and Sui is in the Dev phase, data may be cleared at any time.
+                    Please access iKnows via testnet.</span>
             </div>
             <!--<div class="beta">-->
                 <!--<b class="flex-y-center">-->

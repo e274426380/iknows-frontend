@@ -291,7 +291,6 @@
             current = languages[0].payload;
         }
         // console.error('set locale', current);
-        console.log("nav",locale.value)
         userStore.setLocale(current);
     };
 

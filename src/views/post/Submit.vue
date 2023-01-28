@@ -225,14 +225,16 @@
                 // submitPost(JSON.parse(JSON.stringify(form.value))).then(res => {
                 submitPost(toRaw(form.value)).then(res => {
                     console.log(res);
-                    if (res.Ok) {
+                    if (res.Ok && res.Ok['effects']) {
                         showMessageSuccess(t('message.post.create'));
                         //通过查找create里是否存在owner为topic合约地址的对象来获得新发贴的地址id
-                        //@ts-ignore
-                        const postId = res.Ok.effects.events
-                            .find(item => item.newObject && item.newObject.objectType === contractAddress+"::topic::Topic")
-                            .newObject.objectId
-                        router.push('/post/detail/' + postId);
+                        const postDetail = res.Ok['effects'].events
+                            .find(item => item.newObject && item.newObject.objectType === '0x3571050fdc05bd293110c84e349e3fecb746fcd' + "::topic::Topic")
+                        //成功找到nft，跳转
+                        if (postDetail) {
+                            const postId = postDetail.newObject.objectId;
+                            router.push('/post/detail/' + postId);
+                        }
                         //发布成功后删除草稿箱里的内容。
                         localStorage.removeItem('postDraftBox')
                     }

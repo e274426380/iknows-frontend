@@ -2,7 +2,6 @@ import { JsonRpcProvider } from "@mysten/sui.js";
 import { contractAddress, suiRpcUrl } from "@/types/constants";
 import { showMessageError } from "@/utils/message";
 import { t } from "@/locale";
-import { forEach } from "lodash-es";
 
 const provider = new JsonRpcProvider(suiRpcUrl);
 
@@ -11,13 +10,17 @@ export async function executeMoveCall(moduleName: string, functionName: string, 
     console.log("args", args)
     let res;
     try {
-        res = await window.suiWallet.executeMoveCall({
+        const data = {
             packageObjectId: contractAddress,
             module: moduleName,
             function: functionName,
             typeArguments: [],
             arguments: args, //将参数转换为合约能读懂的数组形式
             gasBudget: 10000,
+        };
+        res = await window.suiWallet.signAndExecuteTransaction({
+            kind: 'moveCall',
+            data: data
         })
     } catch (e) {
         console.error("executeMoveCall Error",res)

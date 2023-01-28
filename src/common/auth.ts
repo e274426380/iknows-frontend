@@ -9,7 +9,9 @@ export async function getSuiUser(address: string): Promise<any> {
     })
     console.log("getUserInfo", res)
     //从返回的用户代币里查询是否包含用户资料，根据type属性查询
-    const type = contractAddress + '::user::UserProfile';
+    // const type = contractAddress + '::user::UserProfile';
+    //TODO sui网络不知名bug，又给我抹了个0
+    const type = '0x3571050fdc05bd293110c84e349e3fecb746fcd' + '::user::UserProfile';
     const userInfo = res.find(item => item.type === type)
     if (userInfo) {
         const res = await getObject(userInfo.objectId).catch(e => {
